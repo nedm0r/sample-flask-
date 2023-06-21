@@ -5,7 +5,7 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    env.TEST_IP = "18.207.214.107"
+                    env.TEST_IP = "54.162.13.250"
                     env.PRODACT_IP = "3.92.212.97"
                 }
                 sh 'echo "Performing cleanup..."'
