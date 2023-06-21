@@ -65,7 +65,6 @@ pipeline {
                                     rm -fr sampleflask.tar.gz
                                     ls
                                     bash /home/ec2-user/sample-flask-/flaskrun.sh > /dev/null 2>&1 & disown
-                                   
                                 '
                             """
                         }
@@ -82,10 +81,22 @@ pipeline {
                             cd /home/ec2-user/sample-flask-
                             chmod +x test.sh
                             ./test.sh
-                             sudo bash /home/ec2-user/sample-flask-/tests/tests.sh
-                             sudo bash /home/ec2-user/sample-flask-/flaskstop.sh
-                             exit
-                             ls
+                            sudo bash /home/ec2-user/sample-flask-/tests/tests.sh
+                            sudo bash /home/ec2-user/sample-flask-/flaskstop.sh
+                            exit
+                            ls
+                        '
+                    """
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                    sh """
+                        cd '
+                            echo "Deploying to production server..."
+                            # Add your deployment commands here
                         '
                     """
                 }
