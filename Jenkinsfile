@@ -65,11 +65,24 @@ pipeline {
                                     rm -fr sampleflask.tar.gz
                                     ls
                                     bash /home/ec2-user/sample-flask-/flaskrun.sh > /dev/null 2>&1 & disown
-                                    
                                 '
                             """
                         }
                     }
+                }
+            }
+        }
+        
+        stage('Testing Flask') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'Project-SSH', keyFileVariable: 'KEY_FILE')]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i \${KEY_FILE} ec2-user@\${TEST_IP} '
+                            cd /home/ec2-user/sample-flask-
+                            chmod +x test.sh
+                            ./test.sh
+                        '
+                    """
                 }
             }
         }
