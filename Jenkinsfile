@@ -61,7 +61,7 @@ pipeline {
                                 scp -i \${KEY_FILE} -o StrictHostKeyChecking=no sampleflask.tar.gz ec2-user@\${TEST_IP}:/home/ec2-user/
                                 ssh-keyscan \${TEST_IP} >> /var/lib/jenkins/.ssh/known_hosts
                                 ssh -o StrictHostKeyChecking=no -i \${KEY_FILE} ec2-user@\${TEST_IP} '
-                                    tar -xzf myflaskproject.tar.gz
+                                    tar -xzf sampleflask.tar.gz
                                     rm -fr sampleflask.tar.gz
                                     ls
                                     bash /home/ec2-user/sample-flask-/flaskrun.sh > /dev/null 2>&1 & disown
