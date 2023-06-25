@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     stages {
         stage('Cleanup') {
             steps {
@@ -12,7 +12,7 @@ pipeline {
                 sh 'rm -rf *'
             }
         }
-        
+
         stage('Clone') {
             steps {
                 sh 'echo "Cloning repository..."'
@@ -20,7 +20,7 @@ pipeline {
                 sh 'ls'
             }
         }
-        
+
         stage('Build') {
             steps {
                 sh 'echo "Building..."'
@@ -29,7 +29,7 @@ pipeline {
                 sh 'ls'
             }
         }
-        
+
         stage('Upload') {
             steps {
                 withCredentials([
@@ -44,7 +44,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Test') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'Project-SSH', keyFileVariable: 'KEY_FILE')]) {
@@ -72,7 +72,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Testing Flask') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'Project-SSH', keyFileVariable: 'KEY_FILE')]) {
@@ -90,16 +90,14 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy') {
             steps {
-                    sh """
-                        cd '
-                            echo "Deploying to production server..."
-                            # Add your deployment commands here
-                        '
-                    """
-                }
+                sh """
+                    echo "Deploying to production server..."
+                    cd /var/lib/jenkins/ansible/
+                    ansible-playbook -i aws_ec2.yml install_flask.yml
+                """
             }
         }
     }
