@@ -1,0 +1,150 @@
+pipeline 
+{
+    agent any
+    
+    triggers 
+    {
+        pollSCM('*/1 * * * *')
+    }
+    
+    stages 
+    {
+        stage('Cleanup') 
+        {
+            steps 
+            {
+                //Removes Unnecessary files
+                echo 'Performing cleanup...'
+                sh 'rm -rf *'
+            }
+        }
+        
+        stage('Clone') 
+        {
+            steps
+            {
+                //clonning from github to workspace
+                echo 'Cloning repository...'
+                sh 'git clone https://github.com/S0ulTak3r/flask.git'
+                sh 'ls'
+            }
+        }
+        
+        stage('Build-create docker image and push') 
+        {
+            steps 
+            {
+                //stage building
+                echo 'Building...'
+                echo ' pull docker'
+                sh 'docker image build -t s0ultak3r/dockerflask flask/PythonFlask/docker-curriculum/flask-app/'
+                echo 'pushing to dockerhub'
+                sh 'docker push s0ultak3r/dockerflask'
+            }
+        }
+        
+
+        stage('Get Test+Prod Instance Details')
+        {
+            steps 
+            {
+                //pulls IP of test instance by automatical means
+                script 
+                {
+                    def instanceTestId = sh(script: "aws ec2 describe-instances --region eu-north-1 --filters 'Name=tag:servernumber,Values=flask1' 'Name=instance-state-name,Values=stopped' | jq -r .Reservations[].Instances[].InstanceId", returnStdout: true).trim()
+                    def instanceProdId = sh(script: "aws ec2 describe-instances --region eu-north-1 --filters 'Name=tag:servernumber,Values=flask2' 'Name=instance-state-name,Values=stopped' | jq -r .Reservations[].Instances[].InstanceId", returnStdout: true).trim()
+                    
+                    if(instanceTestId)
+                    {
+                        //Test Not Running
+                        sh (script: "aws ec2 start-instances --region eu-north-1 --instance-ids ${instanceTestId}")
+                        sh (script: "aws ec2 wait instance-running --region eu-north-1 --instance-ids ${instanceTestId}")
+                    }
+                    else
+                    {
+                        //Gather Id with Running state
+                        instanceTestId= sh(script: "aws ec2 describe-instances --region eu-north-1 --filters 'Name=tag:servernumber,Values=flask1' 'Name=instance-state-name,Values=running' | jq -r .Reservations[].Instances[].InstanceId", returnStdout: true).trim()
+                    }
+                    def publicTestIp = sh(script: "aws ec2 describe-instances --region eu-north-1 --instance-ids ${instanceTestId} | jq -r .Reservations[].Instances[].PublicIpAddress", returnStdout: true).trim()
+                    env.instanceTestId = instanceTestId
+                    env.publicTestIp = publicTestIp
+
+
+                    if(instanceProdId)
+                    {
+                        //prod not running
+                        sh (script: "aws ec2 start-instances --region eu-north-1 --instance-ids ${instanceProdId}")
+                        sh (script: "aws ec2 wait instance-running --region eu-north-1 --instance-ids ${instanceProdId}")
+                    }
+                    else
+                    {
+                        //Gather Id with Running state
+                        instanceProdId= sh (script: "aws ec2 describe-instances --region eu-north-1 --filters 'Name=tag:servernumber,Values=flask2' 'Name=instance-state-name,Values=running' | jq -r .Reservations[].Instances[].InstanceId", returnStdout: true).trim()
+                    }
+                    def publicProdIp =sh(script: "aws ec2 describe-instances --region eu-north-1 --instance-ids ${instanceProdId} | jq -r .Reservations[].Instances[].PublicIpAddress", returnStdout: true).trim() 
+                    env.instanceProdId=instanceProdId
+                    env.publicProdIp=publicProdIp
+
+
+
+                    echo 'installing docker...'
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicTestIp} 'sudo yum update -y'"
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicTestIp} 'sudo yum install docker -y'"
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicTestIp} 'sudo service docker start'"
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicTestIp} 'sudo chkconfig docker on'"
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicTestIp} 'sudo usermod -aG docker ec2-user'"
+                    echo 'installing docker...'
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicProdIp} 'sudo yum update -y'"
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicProdIp} 'sudo yum install docker -y'"
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicProdIp} 'sudo service docker start'"
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicProdIp} 'sudo chkconfig docker on'"
+                    sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicProdIp} 'sudo usermod -aG docker ec2-user'"
+                }
+            }
+        }
+
+        stage('Pull from dockerhub to test server + install docker') 
+        {
+            steps 
+            {
+
+                echo ' pull docker'
+                sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicTestIp} 'docker pull s0ultak3r/dockerflask'"
+            }
+        }
+
+        stage('Run 1 container to test server') 
+        {
+            steps 
+            {
+                sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicTestIp} 'docker container run -d -p 5000:5000 s0ultak3r/dockerflask'"
+            }
+        }
+
+        stage('Test') 
+        {
+            steps 
+            {
+                sh "curl http://${env.publicTestIp}:5000"
+            }
+        }
+        
+        stage('Closing test server- if success') {
+            steps 
+            {
+                sh "aws ec2 stop-instances --region eu-north-1 --instance-ids ${env.instanceTestId}"
+                sh "aws ec2 wait instance-stopped --region eu-north-1 --instance-ids ${env.instanceTestId}"
+            }
+        }
+
+
+        
+        stage('Deployment') {
+            steps 
+            {
+                sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicProdIp} 'docker pull s0ultak3r/dockerflask'"
+                sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/Daniel.pem ec2-user@${env.publicProdIp} 'docker container run -d -p 5003:5000 s0ultak3r/dockerflask'"
+            }
+        }
+    }
+}
