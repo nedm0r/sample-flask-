@@ -37,9 +37,9 @@ pipeline
                 //stage building
                 echo 'Building...'
                 echo 'build docker'
-                sh 'docker image build -t nedm0r/- flask/PythonFlask/docker-curriculum/flask-app/'
+                sh 'docker image build -t nedm0r/docker-flask-project sample-flask-/sample-flask/'
                 echo 'pushing to dockerhub'
-                sh 'docker push nedm0r/-'
+                sh 'docker push nedm0r/docker-flask-project'
             }
         }
         
