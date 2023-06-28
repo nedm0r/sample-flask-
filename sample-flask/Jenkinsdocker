@@ -141,10 +141,11 @@ pipeline
         
         stage('Deployment') {
             steps 
-            {
+            {   
+                sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/222.pem ec2-user@${env.publicProdIp} 'docker stop $(docker ps -q --filter "expose=5000")'"
                 sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/222.pem ec2-user@${env.publicProdIp} 'docker pull nedm0r/docker-flask-project'"
                 sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/222.pem ec2-user@${env.publicProdIp} 'sudo systemctl restart flask'"
-                sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/222.pem ec2-user@${env.publicProdIp} 'docker container run --rm -d -p 5005:5000 nedm0r/docker-flask-project'"
+                sh "ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/222.pem ec2-user@${env.publicProdIp} 'docker container run --rm -d -p 5000:5000 nedm0r/docker-flask-project'"
             }
         }
     }
