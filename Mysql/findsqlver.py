@@ -1,4 +1,4 @@
-  GNU nano 6.2                                                findsqlver.py                                                          
+                                                         
 import docker
 
 client = docker.from_env()
