@@ -3,7 +3,7 @@ import docker
 client = docker.from_env()
 images = client.images.list()
 
-existing_versions = [float(image.tags[0].split(":")[1]) for image in images if image.tags and image.tags[0].startswith("nedm0r/docke>
+existing_versions = [float(image.tags[0].split(":")[1]) for image in images if image.tags and image.tags[0].startswith("nedm0r/flask-database")]
 
 if existing_versions:
     latest_version = max(existing_versions)
