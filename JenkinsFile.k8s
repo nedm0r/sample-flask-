@@ -11,7 +11,7 @@ pipeline {
                 }
                 sh 'echo "Performing cleanup..."'
                 sh 'pwd'
-                sh 'sudo rm -rf *'
+                sh 'rm -rf *'
             }
         }
         stage('Clone') {
