@@ -24,9 +24,9 @@ pipeline {
         stage('Upload to Docker Hub') {
             steps {
                 sh '''
-                    cd /var/lib/jenkins/.kube/
+                    cd /var/lib/jenkins/.kube/sample-flask-/flask
                     python3 finddockerver.py
-                    cd /var/lib/jenkins/.kube/
+                    cd /var/lib/jenkins/.kube/sample-flask-/Mysql
                     python3 findsqlver.py
                 '''
             }
