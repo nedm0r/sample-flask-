@@ -1,11 +1,11 @@
--- Create `images` table
+-- Создание таблицы "images"
 CREATE TABLE images(
    id INT AUTO_INCREMENT PRIMARY KEY,
    url VARCHAR(500) NOT NULL,
    description VARCHAR(500) NOT NULL 
 );
 
--- Insert the cat images with URLs and descriptions
+-- Вставка изображений с URL-адресами и описаниями
 INSERT INTO images(url, description) VALUES
 ('https://media.giphy.com/media/yr7n0u3qzO9nG/giphy.gif', 'a'),
 ('https://media.tenor.com/rMLswxLq2uEAAAAM/funny-as.gif', 'a'),
