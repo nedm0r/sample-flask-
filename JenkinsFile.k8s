@@ -7,7 +7,7 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    env.VM_IP = "192.168.59.1"
+                    env.VM_IP = "192.168.56.102"
                 }
                 sh 'echo "Performing cleanup..."'
                 sh 'pwd'
