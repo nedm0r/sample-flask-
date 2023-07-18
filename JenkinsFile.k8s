@@ -41,7 +41,7 @@ pipeline {
                 sshagent(['Windows-SSH']) {
                     script {
                         def remoteCommand = "docker ps -a | awk '{print \$1}' | xargs -I {} sh -c 'docker stop {} && docker rm {}'"
-                        sshCommand remote: "192.168.59.1", user: "dioni", command: remoteCommand
+                        sshCommand remote: "NedMor", user: "dioni", command: remoteCommand
                     }
                 }
             }
