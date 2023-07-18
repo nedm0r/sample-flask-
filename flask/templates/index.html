@@ -37,14 +37,6 @@
       </a>
     </div>
   </div>
-
-  <div id="stripes">
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
   
   <style>
     * {
@@ -69,59 +61,6 @@
     h5,
     h6 {
       font-family: "Almarai", sans-serif;
-    }
-
-    :root {
-      --first: #53f;
-      --second: #4553ff;
-      --third: #4f40ff;
-      --fourth: #25ddf5;
-      --fifth: #1fa2ff;
-    }
-
-    #stripes {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: -1;
-      width: 100%;
-      height: 100vw;
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      transform: skewY(-12deg);
-      transform-origin: 0;
-    }
-
-    #stripes span {
-      /* border: 1px solid #c00c00; */
-    }
-
-    #stripes span:first-child {
-      grid-column: span 1;
-      background: var(--first);
-    }
-
-    #stripes span:nth-child(2) {
-      grid-column: span 2;
-      background: var(--second);
-    }
-
-    #stripes span:nth-child(3) {
-      grid-column: span 2;
-      background: var(--third);
-    }
-
-    #stripes span:nth-child(4) {
-      grid-column: 6;
-      grid-row: 3;
-      background: var(--fourth);
-    }
-
-    #stripes span:nth-child(5) {
-      grid-column: span 2;
-      grid-row: 4;
-      background: var(--fifth);
     }
 
     .container {
