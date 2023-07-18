@@ -1,186 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DevOps Project</title>
-
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Almarai:wght@800&amp;family=Nunito+Sans&amp;display=swap" />
-</head>
-
-<body>
-  <div class="container">
-    <div class="content">
-      <h1><span style="color:#99004C;">９９００４Ｃ</span></h1>
-      <p>
-        This application is an example of Denis Romanovskyi project.
-      </p>
-    </div>
-
-    <div class="links">
-      <a href="https://www.instagram.com/denisromanovskyi/" target="_blank"
-        rel="noopener noreferrer"><strong>Instagram</strong>
-        <span>@denisromanovskyi</span>
-      </a>
-      <a href="www.linkedin.com/in/denis-romanovskyi-4b386b23a" target="_blank"
-        rel="noopener noreferrer"><strong>LinkedIn</strong>
-        <span>DevOps engineer</span>
-      </a>
-      <a href="https://www.digitalocean.com/docs/app-platform/" target="_blank" rel="noopener noreferrer"><strong>Data</strong><span>Simple example with gifts</span></a>
-      <a href="https://www.digitalocean.com/docs/droplets/how-to/" target="_blank" rel="noopener noreferrer"><strong>App
-          Platform API Documentation</strong>
-        <span>REST API Documentation for App Platform</span>
-      </a>
-    </div>
-  </div>
-  
-  <style>
-    * {
-      box-sizing: border-box;
+pipeline {
+    agent any
+    triggers {
+        pollSCM('*/5 * * * *')
     }
-
-    body {
-      margin: 0;
-      padding: 50px;
-      min-height: 100vh;
-      position: relative;
-      color: #fff;
-      font-family: "Nunito Sans", sans-serif;
-      font-size: 19px;
-      background: #fff; /* Added a white background color */
+    stages {
+        stage('Cleanup') {
+            steps {
+                script {
+                    env.VM_IP = "192.168.56.102"
+                }
+                sh 'echo "Performing cleanup..."'
+                sh 'pwd'
+                sh 'rm -rf *'
+            }
+        }
+        stage('Clone') {
+            steps {
+                sh 'echo "Building..."'
+                sh 'git clone https://github.com/nedm0r/sample-flask-.git'
+                sh 'ls'
+            }
+        }
+        stage('Upload to Docker Hub') {
+            steps {
+                sh '''
+                    cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/flask
+                    python3 finddockerver.py
+                    cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Mysql
+                    python3 findsqlver.py
+                '''
+            }
+        }
+        stage('Testing') {
+            steps {
+                sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+            }
+        }
     }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      font-family: "Almarai", sans-serif;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 50px 0;
-    }
-
-    .content {
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-    }
-
-    h1 span {
-      color: #99004C;
-    }
-
-    p {
-      margin-bottom: 50px;
-    }
-    
-    p a {
-      color: chartreuse;
-    }
-    
-    li {
-      text-align: left;
-    }
-
-    code {
-      display: inline-block;
-      padding: 3px 6px;
-      margin-left: 3px;
-      margin-right: 3px;
-      border-radius: 5px;
-      font-size: 0.8rem;
-      background: #1a2279;
-      color: #dbf1f5;
-    }
-
-    .links {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .links a {
-      position: relative;
-      display: block;
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 5px;
-      padding: 20px;
-      font-size: 1.1rem;
-      text-decoration: none;
-      color: #222;
-      transition: 0.3s ease all;
-      overflow: hidden;
-    }
-
-    .links a:before,
-    .links a:after {
-      font-size: 40px;
-      display: block;
-      position: absolute;
-    }
-
-    .links a:before {
-      content: "";
-      top: -80%;
-      right: -150px;
-      width: 250px;
-      height: 250px;
-      background: rgba(125, 236, 255, 0.6);
-      pointer-events: none;
-      transform: rotate(-25deg);
-      transition: 0.4s cubic-bezier(0.34, 0.31, 0, 1.81) transform;
-    }
-
-    .links a:after {
-      content: "💎";
-      top: 0;
-      bottom: 0;
-      display: flex;
-      align-items: center;
-      right: 30px;
-      transform: translateX(80px);
-      transition: 0.3s cubic-bezier(0.34, 0.31, 0, 1.81) transform;
-    }
-
-    .links a:hover {
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.5);
-    }
-
-    .links a:hover:before {
-      transform: rotate(-25deg) translateX(60px);
-    }
-
-    .links a:hover:after {
-      transform: none;
-    }
-
-    .links a strong,
-    .links a span {
-      position: relative;
-      z-index: 1;
-    }
-
-    .links a strong {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .links a span {
-      color: #787878;
-      font-size: 0.9rem;
-    }
-  </style>
-</body>
-
-</html>
+}
