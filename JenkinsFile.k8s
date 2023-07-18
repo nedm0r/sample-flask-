@@ -36,15 +36,5 @@ pipeline {
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
-        stage('Deploy') {
-            steps {
-                sshagent(['Windows-SSH']) {
-                    script {
-                        def remoteCommand = "docker ps -a | awk '{print \$1}' | xargs -I {} sh -c 'docker stop {} && docker rm {}'"
-                        sshCommand remote: "NedMor", user: "dioni", command: remoteCommand
-                    }
-                }
-            }
-        }
     }
 }
