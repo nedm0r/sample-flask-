@@ -35,6 +35,7 @@ pipeline {
             steps {
                 sh 'kubectl config use-context docker-desktop' 
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                sh ' curl 192.168.59.1:5000'
             }
         }
         stage('Approve') {
@@ -44,7 +45,9 @@ pipeline {
             }
             steps {
                 sh 'echo "Deploying to production..."'
-                // Add the necessary deployment commands for production
+                echo "closing test environment..."
+                sh "kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml"
+                
             }
         }
     }
