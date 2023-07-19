@@ -36,5 +36,15 @@ pipeline {
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
+        stage('Approve') {
+            input {
+                message "Proceed with deploying to production?"
+                ok "Deploy to production"
+            }
+            steps {
+                sh 'echo "Deploying to production..."'
+                // Add the necessary deployment commands for production
+            }
+        }
     }
 }
