@@ -17,7 +17,7 @@ pipeline {
         stage('Clone') {
             steps {
                 sh 'echo "Building..."'
-                sh 'git clone https://github.com/nedm0r/sample-flask-.git'
+                sh 'git clone git@github.com:nedm0r/sample-flask-.git'
                 sh 'ls'
             }
         }
