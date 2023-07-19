@@ -15,6 +15,7 @@ spec:
       containers:
       - name: my-flask-app-container
         image: nedm0r/docker-flask-project:latest
+        imagePullPolicy: Always  # Set the image pull policy to Always
         ports:
         - containerPort: 5000
         env:
@@ -44,6 +45,7 @@ spec:
       containers:
         - name: mysql-container
           image: nedm0r/flask-database:latest
+          imagePullPolicy: Always  # Set the image pull policy to Always
           ports:
             - containerPort: 3306
           env:
