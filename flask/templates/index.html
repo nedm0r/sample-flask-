@@ -74,7 +74,7 @@
     }
 
     h1 {
-      font-size: 2.5rem;
+      font-size: calc(100% + 2rem);
     }
 
     h1 span {
@@ -122,6 +122,22 @@
       overflow: hidden;
     }
 
+    .links a:nth-child(1):after {
+      content: "💎"; /* Instagram - 💎 */
+    }
+
+    .links a:nth-child(2):after {
+      content: "💻"; /* LinkedIn - 💻 */
+    }
+
+    .links a:nth-child(3):after {
+      content: "♾️"; /* Data - ♾️ */
+    }
+
+    .links a:nth-child(4):after {
+      content: "💶"; /* App Platform API - 💶 */
+    }
+
     .links a:before,
     .links a:after {
       font-size: 40px;
@@ -142,7 +158,6 @@
     }
 
     .links a:after {
-      content: "💎";
       top: 0;
       bottom: 0;
       display: flex;
