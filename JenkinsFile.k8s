@@ -38,7 +38,7 @@ pipeline {
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
 
                 // Wait for the deployment to be ready
-                sh 'sleep 300'
+                sh 'sleep 30'
 
                 // Run the 'curl' command to test the application
                 sh 'curl 192.168.59.1:5000'
@@ -56,7 +56,6 @@ pipeline {
                 sh 'echo "Deploying to production..."'
                 sh 'echo "closing test environment..."'  // Added 'echo' before this line
                 sh 'kubectl config use-context gke_astute-impulse-393207_us-central1-c_devops1093'
-                sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
