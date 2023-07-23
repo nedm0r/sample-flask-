@@ -35,8 +35,12 @@ pipeline {
             steps {
                 sh 'kubectl config use-context docker-desktop' 
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-                sh 'sleep 30'
-                sh 'curl 192.168.59.1:5000'  // Added 'sh' before curl command
+
+                // Wait for the deployment to be ready
+                sh 'kubectl rollout status deployment/my-flask-app-deployment -n your-namespace --timeout=300s'
+
+                // Run the 'curl' command to test the application
+                sh 'curl 192.168.59.1:5000'
             }
         }
         stage('Deploy') {
