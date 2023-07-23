@@ -38,7 +38,7 @@ pipeline {
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
 
                 // Wait for the deployment to be ready
-                sh 'kubectl rollout status deployment/my-flask-app-deployment -n your-namespace --timeout=300s'
+                sh 'sleep 300'
 
                 // Run the 'curl' command to test the application
                 sh 'curl 192.168.59.1:5000'
