@@ -46,7 +46,7 @@ pipeline {
         }
         stage('Confirm Deployment') {
             steps {
-                input "Do you want to proceed with the deployment to production?
+                input "Do you want to proceed with the deployment to production?"
             }
         }
         stage('Deploy') {
