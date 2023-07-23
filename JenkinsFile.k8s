@@ -24,9 +24,9 @@ pipeline {
         stage('Upload to Docker Hub') {
             steps {
                 sh '''
-                    cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/flask
+                    cd /workspace/Pipeline-K8S/sample-flask-/flask
                     python3 finddockerver.py
-                    cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Mysql
+                    cd /workspace/Pipeline-K8S/sample-flask-/Mysql
                     python3 findsqlver.py
                 '''
             }
@@ -34,13 +34,19 @@ pipeline {
         stage('Testing') {
             steps {
                 sh 'kubectl config use-context docker-desktop' 
-                sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                sh 'kubectl delete -f /workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                sh 'kubectl apply -f /workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
 
                 // Wait for the deployment to be ready
                 sh 'kubectl rollout status deployment/my-flask-app-deployment -n your-namespace --timeout=300s'
 
                 // Run the 'curl' command to test the application
                 sh 'curl 192.168.59.1:5000'
+            }
+        }
+        stage('Confirm Deployment') {
+            steps {
+                input "Do you want to proceed with the deployment to production?"
             }
         }
         stage('Deploy') {
@@ -50,9 +56,8 @@ pipeline {
                 sh 'echo "Deploying to production..."'
                 sh 'echo "closing test environment..."'  // Added 'echo' before this line
                 sh 'kubectl config use-context gke_astute-impulse-393207_europe-north1-a_devops1093'
-                sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-                sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-
+                sh 'kubectl delete -f /workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                sh 'kubectl apply -f /workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
     }
