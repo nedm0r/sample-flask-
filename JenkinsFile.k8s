@@ -34,7 +34,7 @@ pipeline {
         stage('Testing') {
             steps {
                 sh 'kubectl config use-context docker-desktop' 
-                sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
 
                 // Wait for the deployment to be ready
