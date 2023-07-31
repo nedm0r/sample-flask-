@@ -64,7 +64,7 @@ pipeline {
                 sh 'echo "Deploying to production..."'
                 sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                 sh 'echo "closing test environment..."'  // Added 'echo' before this line
-                sh 'kubectl config use-context gke_astute-impulse-393207_us-central1-c_devops1093'
+                sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
