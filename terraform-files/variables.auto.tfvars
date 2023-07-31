@@ -1,4 +1,4 @@
-gcp_credentials = "/var/lib/jenkins/project/sample-flask-/astute-impulse-393207-a213fc4eab2e.json"
+gcp_credentials = "/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
 gcp_project_id = "astute-impulse-393207"
 gcp_region = "us-east1"
 gke_zones  = ["us-east1-b"] 
