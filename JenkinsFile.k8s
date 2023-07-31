@@ -49,6 +49,14 @@ pipeline {
                 input "Do you want to proceed with the deployment to production?"
             }
         }
+        stage('Terraform Deployment') {
+            steps {
+                sh 'echo "Deploying with Terraform..."'
+                sh 'cd /var/lib/jenkins/workspace/terraform-files/'
+                sh 'terraform init'
+                sh 'terraform apply -auto-approve'
+            }
+        }
         stage('Deploy') {
             steps {
                 sh 'echo "Deploying..."'
