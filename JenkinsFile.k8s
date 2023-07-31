@@ -54,7 +54,7 @@ pipeline {
                 sh 'echo "Deploying with Terraform..."'
                 sh 'cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/'
                 sh 'terraform init'
-                sh 'terraform apply -auto-approve'
+                sh 'terraform apply -auto-approve -target=google_container_cluster.gke_cluster -target=google_storage_bucket.my_bucket'
             }
         }
         stage('Deploy') {
