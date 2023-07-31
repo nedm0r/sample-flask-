@@ -52,7 +52,7 @@ pipeline {
         stage('Terraform Deployment') {
             steps {
                 sh 'echo "Deploying with Terraform..."'
-                sh 'cd /var/lib/jenkins/workspace/terraform-files/'
+                sh 'cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/'
                 sh 'terraform init'
                 sh 'terraform apply -auto-approve'
             }
