@@ -52,11 +52,15 @@ pipeline {
         stage('Terraform Deployment') {
             steps {
                 sh 'echo "Deploying with Terraform..."'
-                sh 'ls' // Проверяем содержимое директории, чтобы убедиться, что Terraform находится в нужной директории
-                sh 'terraform init -chdir=/var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/'
-                sh 'terraform import -chdir=/var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/ google_storage_bucket.my_bucket bucket-1093-terraform || true'
-                sh 'terraform import -chdir=/var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/ google_container_cluster.gke_cluster projects/astute-impulse-393207/locations/us-east1-b/clusters/devops-1093-cluster-tf || true'
-                sh 'terraform apply -auto-approve -target=google_container_cluster.gke_cluster -target=google_storage_bucket.my_bucket -chdir=/var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/'
+                sh '''
+                    cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/
+                    ls
+                    chmod +rx main.tf variables.auto.tfvars variables.tf
+                    terraform init
+                    terraform import google_storage_bucket.my_bucket bucket-1093-terraform || true
+                    terraform import google_container_cluster.gke_cluster projects/astute-impulse-393207/locations/us-east1-b/clusters/devops-1093-cluster-tf || true
+                    terraform apply -auto-approve -target=google_container_cluster.gke_cluster -target=google_storage_bucket.my_bucket
+                '''
             }
         }
         stage('Deploy') {
