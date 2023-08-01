@@ -53,6 +53,7 @@ pipeline {
             steps {
                 sh 'echo "Deploying with Terraform..."'
                 sh 'cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/' // Добавляем команду cd для изменения директории
+                sh 'pwd' // Выводим текущую рабочую директорию, чтобы убедиться, что мы находимся в нужном месте
                 sh 'ls' // Проверяем содержимое директории, чтобы убедиться, что Terraform находится в нужной директории
                 sh 'terraform init'
                 sh 'terraform import google_storage_bucket.my_bucket bucket-1093-terraform || true'
