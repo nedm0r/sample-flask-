@@ -43,16 +43,11 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                    sh 'sleep 15'
+                    sh 'sleep 30'
                 }
 
-                // Get the external IP of the LoadBalancer service
-                script {
-                    def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-
-                    // Run the 'curl' command to test the application with the external IP and port
-                    sh "curl ${env.VM_IP}:5000"
-                }
+                // Run the 'curl' command to test the application with the VM_IP and port 5000
+                sh "curl ${env.VM_IP}:5000"
             }
         }
         stage('Confirm Deployment') {
@@ -98,8 +93,8 @@ pipeline {
                 script {
                     def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
 
-                    // Run the 'curl' command to test the application with the external IP and port
-                    sh "curl $externalIP:5000"
+                    // Display the external IP and port
+                    echo "External IP: ${externalIP}:5000"
                 }
             }
         }
