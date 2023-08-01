@@ -41,7 +41,7 @@ pipeline {
                 sh 'sleep 15'
 
                 // Get the external IP of the LoadBalancer service
-                def externalIP = sh (returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+                def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
 
                 // Run the 'curl' command to test the application with the external IP and port
                 sh "curl $externalIP:5000"
@@ -85,7 +85,7 @@ pipeline {
                 sh 'sleep 15'
 
                 // Get the external IP of the LoadBalancer service
-                def externalIP = sh (returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+                def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
 
                 // Run the 'curl' command to test the application with the external IP and port
                 sh "curl $externalIP:5000"
