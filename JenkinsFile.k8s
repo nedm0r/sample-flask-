@@ -68,9 +68,14 @@ pipeline {
                 sh 'echo "Deploying..."'
                 // Add your additional deployment steps here
                 sh 'echo "Deploying to production..."'
-                sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-                sh 'echo "closing test environment..."'  // Added 'echo' before this line
+                
+                // Get credentials for the desired context
+                sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
+
+                // Switch to the desired context
                 sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
+
+                // Apply the Kubernetes manifest
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
