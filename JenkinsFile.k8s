@@ -52,8 +52,7 @@ pipeline {
         stage('Terraform Deployment') {
             steps {
                 sh 'echo "Deploying with Terraform..."'
-                sh 'cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/'
-                sh 'ls' // Добавляем команду ls для проверки содержимого директории
+                sh 'cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/' // Добавляем команду cd для изменения директории
                 sh 'terraform init'
                 sh 'terraform import google_storage_bucket.my_bucket bucket-1093-terraform || true'
                 sh 'terraform import google_container_cluster.gke_cluster projects/astute-impulse-393207/locations/us-east1-b/clusters/devops-1093-cluster-tf || true'
