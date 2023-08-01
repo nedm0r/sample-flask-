@@ -65,7 +65,7 @@ pipeline {
                     terraform init
                     terraform import google_storage_bucket.my_bucket bucket-1093-terraform || true
                     terraform import google_container_cluster.gke_cluster projects/astute-impulse-393207/locations/us-east1-b/clusters/devops-1093-cluster-tf || true
-                    terraform apply -auto-approve 
+                    terraform apply -auto-approve -target=google_container_cluster.gke_cluster -target=google_storage_bucket.my_bucket 
                 '''
             }
         }
