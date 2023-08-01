@@ -11,7 +11,7 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    env.VM_IP = "192.168.56.102"
+                    env.VM_IP = "192.168.59.1"
                 }
                 sh 'echo "Performing cleanup..."'
                 sh 'pwd'
@@ -51,7 +51,7 @@ pipeline {
                     def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
 
                     // Run the 'curl' command to test the application with the external IP and port
-                    sh "curl $externalIP:5000"
+                    sh "curl ${env.VM_IP}:5000"
                 }
             }
         }
