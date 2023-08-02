@@ -1,3 +1,10 @@
+terraform {
+  backend "gcs" {
+    bucket = var.gcp_bucket_name
+    prefix = "terraform/state"
+  }
+}
+
 provider "google" {
   credentials = file(var.gcp_credentials)
   project     = var.gcp_project_id
@@ -24,16 +31,6 @@ output "cluster_endpoint" {
 output "cluster_ca_certificate" {
   value     = google_container_cluster.gke_cluster.master_auth.0.cluster_ca_certificate
   sensitive = true
-}
-
-resource "google_storage_bucket" "my_bucket" {
-  name          = var.gcp_bucket_name
-  location      = var.gcp_region
-  force_destroy = true
-
-  versioning {
-    enabled = false
-  }
 }
 
 resource "google_compute_firewall" "allow_inbound" {
