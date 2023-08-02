@@ -10,7 +10,7 @@ provider "google" {
   credentials = file(var.gcp_credentials)
   project     = var.gcp_project_id
   region      = var.gcp_region
-  version     = "~> 3.5"
+  
 }
 
 resource "google_container_cluster" "gke_cluster" {
