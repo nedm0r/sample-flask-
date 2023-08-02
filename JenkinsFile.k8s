@@ -65,8 +65,6 @@ pipeline {
                     chmod +rx main.tf variables.auto.tfvars variables.tf
                     terraform init
                     terraform refresh 
-                    terraform import google_compute_firewall.allow_inbound projects/astute-impulse-393207/global/firewalls/allow-inbound
-                    terraform import google_compute_firewall.allow_outbound projects/astute-impulse-393207/global/firewalls/allow-outbound
                     terraform destroy -auto-approve 
                 '''
             }
