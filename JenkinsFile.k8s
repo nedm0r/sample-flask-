@@ -64,7 +64,7 @@ pipeline {
                     ls
                     chmod +rx main.tf variables.auto.tfvars variables.tf
                     terraform init
-                    terraform apply -auto-approve -target=google_container_cluster.gke_cluster -target=google_storage_bucket.my_bucket 
+                    terraform apply -auto-approve 
                 '''
             }
         }
