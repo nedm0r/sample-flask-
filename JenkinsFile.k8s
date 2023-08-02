@@ -64,6 +64,7 @@ pipeline {
                     ls
                     chmod +rx main.tf variables.auto.tfvars variables.tf
                     terraform init
+                    terraform refresh 
                     terraform apply -auto-approve 
                 '''
             }
