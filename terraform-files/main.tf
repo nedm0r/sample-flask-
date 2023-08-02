@@ -7,7 +7,7 @@ terraform {
 
 
 provider "google" {
-  credentials = file(var.gcp_credentials)
+  credentials = file('/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json')
   project     = var.gcp_project_id
   region      = var.gcp_region
   
