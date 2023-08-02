@@ -8,7 +8,7 @@ terraform {
 variable "gcp_credentials" {
   description = "Path to the GCP service account key file"
   type        = string
-  default     = file(var.gcp_credentials)  # Replace with the actual path to your service account key file
+  default     = file("var.gcp_credentials")  # Replace with the actual path to your service account key file
 }
 
 provider "google" {
