@@ -5,6 +5,11 @@ terraform {
   }
 }
 
+variable "gcp_credentials" {
+  description = "Path to the GCP service account key file"
+  type        = string
+  default     = var.gcp_credentials  # Replace with the actual path to your service account key file
+}
 
 provider "google" {
   project     = var.gcp_project_id
