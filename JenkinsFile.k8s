@@ -65,7 +65,7 @@ pipeline {
                     chmod +rx main.tf variables.auto.tfvars variables.tf
                     terraform init
                     terraform refresh 
-                    terraform destroy -auto-approve 
+                    terraform apply -auto-approve 
                 '''
             }
         }
