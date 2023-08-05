@@ -11,7 +11,6 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    env.GOOGLE_APPLICATION_CREDENTIALS = '/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json'
                     env.VM_IP = "192.168.59.1"
                 }
                 sh 'echo "Performing cleanup..."'
@@ -66,7 +65,7 @@ pipeline {
                     chmod +rx main.tf variables.auto.tfvars variables.tf
                     terraform init
                     terraform refresh 
-                    terraform destroy -auto-approve 
+                    terraform apply -auto-approve 
                 '''
             }
         }
