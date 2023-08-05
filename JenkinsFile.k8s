@@ -49,6 +49,7 @@ pipeline {
 
                 // Run the 'curl' command to test the application with the VM_IP and port 5000
                 sh "curl ${env.VM_IP}:5000"
+                sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
         stage('Confirm Deployment') {
@@ -65,7 +66,7 @@ pipeline {
                     chmod +rx main.tf variables.auto.tfvars variables.tf
                     terraform init
                     terraform refresh 
-                    terraform apply -auto-approve 
+                    terraform destroy -auto-approve 
                 '''
             }
         }
