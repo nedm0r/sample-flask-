@@ -62,7 +62,7 @@ pipeline {
                 sh '''
                     cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/
                     ls
-                    chmod +rx main.tf variables.auto.tfvars variables.tf
+                    chmod +r main.tf variables.auto.tfvars variables.tf
                     terraform init
                     terraform refresh 
                     terraform apply -auto-approve 
