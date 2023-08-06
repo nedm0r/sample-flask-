@@ -84,11 +84,7 @@ pipeline {
                 '''
             }
         }
-  pipeline {
-    agent any
-
-    stages {
-        // ... other stages ...
+  
 
         stage('Deploy') {
             steps {
