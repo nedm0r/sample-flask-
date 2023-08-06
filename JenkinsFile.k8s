@@ -107,7 +107,7 @@ pipeline {
                     retry(30)
                    {
                      sleep 10 // Wait for 10 seconds between retries
-                     sh "curl http://${server}:${port}"
+                     sh "curl ${externalIP}:5000"
                     }
                   } 
                      catch (Exception e)
