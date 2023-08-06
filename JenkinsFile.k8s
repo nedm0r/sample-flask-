@@ -43,8 +43,8 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                    sh 'kubectl wait --for=condition=ready deployment/my-flask-app-deployment'
-                    sh 'kubectl wait --for=condition=ready deployment/mysql-deployment'
+                    sh 'kubectl wait --for=condition=Ready pods --all'
+
                 }
 
                 // Run the 'curl' command to test the application with the VM_IP and port 5000
