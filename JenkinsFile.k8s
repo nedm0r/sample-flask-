@@ -43,9 +43,21 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                         sh 'kubectl wait --for=condition=ContainersReady pod -l app=my-flask-app'
-                         sh 'kubectl wait --for=condition=ContainersReady pod -l app=mysql-app'
-
+                         try
+    {
+        echo "testing test environment..."
+        retry(30)
+        {
+            sleep 10 // Wait for 10 seconds between retries
+            sh "curl http://$VM.IP:5000"
+        }
+    }
+    catch (Exception e)
+    {
+        echo "Error: ${e.getMessage()}"
+        currentBuild.result = 'FAILURE'
+        error "Failed To Curl Test"
+    }
                 }
 
                 // Run the 'curl' command to test the application with the VM_IP and port 5000
