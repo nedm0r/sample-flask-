@@ -43,7 +43,8 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                    sh 'sleep 30'
+                    sh 'kubectl wait --for=condition=ready deployment/my-flask-app'
+                    sh 'kubectl wait --for=condition=ready deployment/mysql-deployment'
                 }
 
                 // Run the 'curl' command to test the application with the VM_IP and port 5000
@@ -87,7 +88,8 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                    sh 'sleep 15'
+                    sh 'kubectl wait --for=condition=ready deployment/my-flask-app'
+                    sh 'kubectl wait --for=condition=ready deployment/mysql-deployment'
                 }
 
                 // Get the external IP of the LoadBalancer service
