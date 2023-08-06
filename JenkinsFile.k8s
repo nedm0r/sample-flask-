@@ -43,8 +43,8 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                         sh 'kubectl wait --for=condition=Ready pod -l app=my-flask-app'
-                         sh 'kubectl wait --for=condition=Ready pod -l app=mysql-app'
+                         sh 'kubectl wait --for=condition=ContainersReady pod -l app=my-flask-app'
+                         sh 'kubectl wait --for=condition=ContainersReady pod -l app=mysql-app'
 
                 }
 
