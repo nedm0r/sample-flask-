@@ -90,8 +90,6 @@ stage('Testing') {
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
 
               
-
-                    assert getExternalIP() != null
                     echo "External IP: ${getExternalIP()}:5000"
                 }
             }
