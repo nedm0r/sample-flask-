@@ -35,41 +35,33 @@ pipeline {
                 '''
             }
         }
-        stage('Testing') {
+stage('Testing') {
             steps {
-                sh 'kubectl config use-context docker-desktop' 
+                sh 'kubectl config use-context docker-desktop'
                 sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-
-                // Wait for the deployment to be ready
                 script {
-                         try
-                           {
-        echo "testing test environment..."
-        retry(30)
-        {
-            sleep 10 // Wait for 10 seconds between retries
-            sh "curl http://${VM_IP}:5000"
-        }
-    }
-    catch (Exception e)
-    {
-        echo "Error: ${e.getMessage()}"
-        currentBuild.result = 'FAILURE'
-        error "Failed To Curl Test"
-    }
+                    try {
+                        echo "testing test environment..."
+                        retry(30) {
+                            sleep 10
+                            sh "curl http://${env.VM_IP}:5000"
+                        }
+                    } catch (Exception e) {
+                        echo "Error: ${e.getMessage()}"
+                        error "Failed To Curl Test"
+                    }
                 }
-
-                // Run the 'curl' command to test the application with the VM_IP and port 5000
-                sh "curl ${env.VM_IP}:5000"
                 sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
+
         stage('Confirm Deployment') {
             steps {
                 input "Do you want to proceed with the deployment to production?"
             }
         }
+
         stage('Terraform Deployment') {
             steps {
                 sh 'echo "Deploying with Terraform..."'
@@ -84,31 +76,24 @@ pipeline {
                 '''
             }
         }
-  
 
-       stage('Deploy') {
-          steps {
-            sh 'echo "Deploying..."'
-            sh 'echo "Deploying to production..."'
-            
-            // Get credentials for the desired context
-            sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
+        stage('Deploy') {
+            steps {
+                sh 'echo "Deploying..."'
+                sh 'echo "Deploying to production..."'
+                sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
+                sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
+                sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
 
-            // Switch to the desired context
-            sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
+                script {
+                    def getExternalIP() {
+                        return sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+                    }
 
-            // Apply the Kubernetes manifest
-            sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-
-            // Add a def function here
-            def getExternalIP() {
-                // Get the external IP of the LoadBalancer service
-                return sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+                    assert getExternalIP() != null
+                    echo "External IP: ${getExternalIP()}:5000"
+                }
             }
-
-            assert getExternalIP() != null
-            echo "External IP: ${getExternalIP()}:5000"
         }
     }
-}
 }
