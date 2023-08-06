@@ -43,7 +43,7 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                    sh 'kubectl wait --for=condition=ready deployment/my-flask-app'
+                    sh 'kubectl wait --for=condition=ready deployment/my-flask-app-deployment'
                     sh 'kubectl wait --for=condition=ready deployment/mysql-deployment'
                 }
 
@@ -88,7 +88,7 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                    sh 'kubectl wait --for=condition=ready deployment/my-flask-app'
+                    sh 'kubectl wait --for=condition=ready deployment/my-flask-app-deployment'
                     sh 'kubectl wait --for=condition=ready deployment/mysql-deployment'
                 }
 
