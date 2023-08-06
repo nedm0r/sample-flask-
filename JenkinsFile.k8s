@@ -101,10 +101,23 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                 sh 'kubectl wait --for=condition=Ready pod -l app=my-flask-app'
-                 sh 'kubectl wait --for=condition=Ready pod -l app=mysql-deployment'
+                try
+                  {
+                    echo "testing test environment..."
+                    retry(30)
+                   {
+                     sleep 10 // Wait for 10 seconds between retries
+                     sh "curl http://${server}:${port}"
+                    }
+                  } 
+                     catch (Exception e)
+                  {
+                     echo "Error: ${e.getMessage()}"
+                     currentBuild.result = 'FAILURE'
+                     error "Failed To Curl Test"
+                  }
 
-                }
+                  }
 
                 // Get the external IP of the LoadBalancer service
                 script {
