@@ -84,10 +84,15 @@ pipeline {
                 '''
             }
         }
+  pipeline {
+    agent any
+
+    stages {
+        // ... other stages ...
+
         stage('Deploy') {
             steps {
                 sh 'echo "Deploying..."'
-                // Add your additional deployment steps here
                 sh 'echo "Deploying to production..."'
                 
                 // Get credentials for the desired context
@@ -99,34 +104,31 @@ pipeline {
                 // Apply the Kubernetes manifest
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
 
+                // Add a def function here
+                def getExternalIP() {
+                    return sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+                }
+                def externalIP = getExternalIP()
+
                 // Wait for the deployment to be ready
                 script {
-                try
-                  {
-                    echo "testing test environment..."
-                    retry(30)
-                   {
-                     sleep 10 // Wait for 10 seconds between retries
-                     sh "curl ${externalIP}:5000"
+                    try {
+                        echo "testing test environment..."
+                        retry(30) {
+                            sleep 10 // Wait for 10 seconds between retries
+                            sh "curl ${externalIP}:5000"
+                        }
+                    } catch (Exception e) {
+                        echo "Error: ${e.getMessage()}"
+                        currentBuild.result = 'FAILURE'
+                        error "Failed To Curl Test"
                     }
-                  } 
-                     catch (Exception e)
-                  {
-                     echo "Error: ${e.getMessage()}"
-                     currentBuild.result = 'FAILURE'
-                     error "Failed To Curl Test"
-                  }
-
-                  }
-
-                // Get the external IP of the LoadBalancer service
-                script {
-                    def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-
-                    // Display the external IP and port
-                    echo "External IP: ${externalIP}:5000"
                 }
+
+                // Display the external IP and port
+                echo "External IP: ${externalIP}:5000"
             }
         }
     }
 }
+
