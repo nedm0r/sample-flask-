@@ -88,8 +88,9 @@ pipeline {
 
                 // Wait for the deployment to be ready
                 script {
-                    sh 'kubectl wait --for=condition=ready deployment/my-flask-app-deployment'
-                    sh 'kubectl wait --for=condition=ready deployment/mysql-deployment'
+                 sh 'kubectl wait --for=condition=Ready pod -l app=my-flask-app'
+                 sh 'kubectl wait --for=condition=Ready pod -l app=mysql-deployment'
+
                 }
 
                 // Get the external IP of the LoadBalancer service
