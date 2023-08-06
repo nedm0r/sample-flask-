@@ -2,6 +2,10 @@ import hudson.model.*
 import jenkins.model.*
 import org.jenkinsci.plugins.*
 
+def getExternalIP() {
+    return sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+}
+
 pipeline {
     agent any
     triggers {
@@ -85,10 +89,7 @@ stage('Testing') {
                 sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
 
-                script {
-                    def getExternalIP() {
-                        return sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-                    }
+              
 
                     assert getExternalIP() != null
                     echo "External IP: ${getExternalIP()}:5000"
