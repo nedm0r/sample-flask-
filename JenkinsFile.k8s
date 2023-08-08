@@ -49,7 +49,7 @@ pipeline {
                     try {
                         echo "Testing test environment..."
                         retry(30) {
-                            sleep 10
+                            sleep 20
                             sh "curl ${env.VM_IP}:5000"
                         }
                     } catch (Exception e) {
