@@ -3,43 +3,49 @@ pipeline {
     triggers {
         pollSCM('*/5 * * * *')
     }
+    environment {
+        VM_IP = "192.168.59.1"
+    }
     stages {
         stage('Cleanup') {
             steps {
                 script {
-                    env.VM_IP = "192.168.59.1"
+                    sh 'echo "Performing cleanup..."'
+                    sh 'pwd'
+                    sh 'rm -rf *'
                 }
-                sh 'echo "Performing cleanup..."'
-                sh 'pwd'
-                sh 'rm -rf *'
             }
         }
         
         stage('Clone') {
             steps {
-                sh 'echo "Building..."'
-                sh 'git clone git@github.com:nedm0r/sample-flask-.git'
-                sh 'ls'
+                script {
+                    sh 'echo "Building..."'
+                    sh 'git clone git@github.com:nedm0r/sample-flask-.git'
+                    sh 'ls'
+                }
             }
         }
         
         stage('Upload to Docker Hub') {
             steps {
-                sh '''
-                    cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/flask
-                    python3 finddockerver.py
-                    cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Mysql
-                    python3 findsqlver.py
-                '''
+                script {
+                    sh '''
+                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/flask
+                        python3 finddockerver.py
+                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Mysql
+                        python3 findsqlver.py
+                    '''
+                }
             }
         }
         
         stage('Testing') {
             steps {
-                sh 'kubectl config use-context docker-desktop'
-                sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
-                sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                 script {
+                    sh 'kubectl config use-context docker-desktop'
+                    sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
+                    sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                     try {
                         echo "Testing test environment..."
                         retry(30) {
@@ -49,9 +55,10 @@ pipeline {
                     } catch (Exception e) {
                         echo "Error: ${e.getMessage()}"
                         error "Failed To Curl Test"
+                    } finally {
+                        sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                     }
                 }
-                sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
         
@@ -63,16 +70,18 @@ pipeline {
         
         stage('Terraform Deployment') {
             steps {
-                sh 'echo "Deploying with Terraform..."'
-                sh '''
-                    cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/
-                    ls
-                    chmod +r main.tf variables.auto.tfvars variables.tf
-                    export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                    terraform init
-                    terraform refresh 
-                    terraform apply -auto-approve 
-                '''
+                script {
+                    sh 'echo "Deploying with Terraform..."'
+                    sh '''
+                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/
+                        ls
+                        chmod +r main.tf variables.auto.tfvars variables.tf
+                        export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
+                        terraform init
+                        terraform refresh 
+                        terraform apply -auto-approve 
+                    '''
+                }
             }
         }
         
@@ -86,13 +95,9 @@ pipeline {
                     sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
                     sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                     sh 'kubectl rollout restart deployments'
-                }
-                
-                steps {
-                    script {
-                        def externalIP = getExternalIP()
-                        echo "External IP: ${externalIP}:5000"
-                    }
+                    
+                    def externalIP = getExternalIP()
+                    echo "External IP: ${externalIP}:5000"
                 }
             }
         }
