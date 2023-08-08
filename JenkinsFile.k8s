@@ -55,9 +55,9 @@ pipeline {
                     } catch (Exception e) {
                         echo "Error: ${e.getMessage()}"
                         error "Failed To Curl Test"
-                    } finally {
-                        sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-                    }
+                    } 
+                    sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                    
                 }
             }
         }
