@@ -94,7 +94,8 @@ pipeline {
                     sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
                     sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
                     sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-                    sh 'kubectl rollout restart /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                    sh 'kubectl rollout restart deployment/my-flask-app-deployment'
+                    sh 'kubectl rollout restart deployment/mysql-deployment'
                     
                     def externalIP = getExternalIP()
                     echo "External IP: ${externalIP}:5000"
