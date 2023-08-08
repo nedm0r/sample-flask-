@@ -1,11 +1,3 @@
-import hudson.model.*
-import jenkins.model.*
-import org.jenkinsci.plugins.*
-
-def getExternalIP() {
-    return sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-}
-
 pipeline {
     agent any
     triggers {
@@ -22,6 +14,7 @@ pipeline {
                 sh 'rm -rf *'
             }
         }
+        
         stage('Clone') {
             steps {
                 sh 'echo "Building..."'
@@ -29,6 +22,7 @@ pipeline {
                 sh 'ls'
             }
         }
+        
         stage('Upload to Docker Hub') {
             steps {
                 sh '''
@@ -39,14 +33,15 @@ pipeline {
                 '''
             }
         }
-stage('Testing') {
+        
+        stage('Testing') {
             steps {
                 sh 'kubectl config use-context docker-desktop'
                 sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
                 sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                 script {
                     try {
-                        echo "testing test environment..."
+                        echo "Testing test environment..."
                         retry(30) {
                             sleep 10
                             sh "curl http://${env.VM_IP}:5000"
@@ -59,13 +54,13 @@ stage('Testing') {
                 sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
             }
         }
-
+        
         stage('Confirm Deployment') {
             steps {
                 input "Do you want to proceed with the deployment to production?"
             }
         }
-
+        
         stage('Terraform Deployment') {
             steps {
                 sh 'echo "Deploying with Terraform..."'
@@ -80,21 +75,30 @@ stage('Testing') {
                 '''
             }
         }
-
+        
         stage('Deploy') {
             steps {
-                sh 'echo "Deploying..."'
-                sh 'echo "Deploying to production..."'
-                sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
-                sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
-                sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-                sh 'kubectl rollout -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-
-
-              
-                    echo "External IP: ${getExternalIP()}:5000"
+                script {
+                    echo "Deploying..."
+                    echo "Deploying to production..."
+                    
+                    sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
+                    sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
+                    sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                    sh 'kubectl rollout -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                }
+                
+                steps {
+                    script {
+                        def externalIP = getExternalIP()
+                        echo "External IP: ${externalIP}:5000"
+                    }
                 }
             }
         }
     }
+}
 
+def getExternalIP() {
+    return sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+}
