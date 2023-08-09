@@ -4,10 +4,6 @@ provider "google" {
   region      = var.gcp_region
 }
 
-resource "google_storage_bucket" "terraform_bucket" {
-  name     = var.gcp_bucket_name
-  location = var.gcp_bucket_location
-}
 
 terraform {
   backend "gcs" {
