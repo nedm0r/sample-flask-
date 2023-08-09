@@ -1,4 +1,0 @@
-apiVersion: v2
-name: my-flask-chart
-description: A Helm chart for deploying Flask application and MySQL database
-version: 0.1.0
