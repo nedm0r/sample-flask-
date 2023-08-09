@@ -1,16 +1,9 @@
-resource "google_storage_bucket" "terraform_bucket" {
-  name     = var.gcp_bucket_name
-  location = var.gke_zones[0]
-}
-
-
 terraform {
   backend "gcs" {
-    bucket = var.gcp_bucket_name
+    bucket = "bucket-1093-terraform"
     prefix = "terraform/state"
   }
 }
-
 
 provider "google" {
   credentials = file(var.gcp_credentials)
