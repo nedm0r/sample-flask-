@@ -1,15 +1,19 @@
-terraform {
-  backend "gcs" {
-    bucket = "bucket-1093-terraform"
-    prefix = "terraform/state"
-  }
-}
-
 provider "google" {
   credentials = file(var.gcp_credentials)
   project     = var.gcp_project_id
   region      = var.gcp_region
-  
+}
+
+resource "google_storage_bucket" "terraform_bucket" {
+  name     = var.gcp_bucket_name
+  location = var.gcp_bucket_location
+}
+
+terraform {
+  backend "gcs" {
+    bucket = google_storage_bucket.terraform_bucket.name
+    prefix = "terraform/state"
+  }
 }
 
 resource "google_container_cluster" "gke_cluster" {
@@ -37,7 +41,7 @@ resource "google_compute_firewall" "allow_inbound" {
   name    = "allow-inbound"
   network = "default"
 
-  # Правила для входящего трафика
+  # Inbound traffic rules
   allow {
     protocol = "tcp"
     ports    = ["22", "5000", "80", "443"]
@@ -50,7 +54,7 @@ resource "google_compute_firewall" "allow_outbound" {
   name    = "allow-outbound"
   network = "default"
 
-  # Правила для исходящего трафика
+  # Outbound traffic rules
   allow {
     protocol = "icmp"
   }
