@@ -6,7 +6,7 @@ resource "google_storage_bucket" "terraform_bucket" {
 
 terraform {
   backend "gcs" {
-    bucket = "bucket-1093-terraform"
+    bucket = var.gcp_bucket_name
     prefix = "terraform/state"
   }
 }
