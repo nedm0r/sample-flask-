@@ -1,0 +1,18 @@
+myFlaskApp:
+  replicaCount: 1
+  image:
+    repository: nedm0r/docker-flask-project
+    tag: latest
+  env:
+    MYSQL_PASSWORD: password
+    MYSQL_USER: root
+    MYSQL_HOST: db
+    MYSQL_DATABASE: flask_db
+
+mysql:
+  replicaCount: 1
+  image:
+    repository: nedm0r/flask-database
+    tag: latest
+  env:
+    MYSQL_ROOT_PASSWORD: password
