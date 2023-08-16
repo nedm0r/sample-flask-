@@ -18,9 +18,13 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
-        envFrom:
-        - secretRef:
-            name: mysql-secret  # Name of the Secret
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-root-password
+                key: MYSQL_ROOT_PASSWORD
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -42,6 +46,9 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 3306
-        envFrom:
-        - secretRef:
-            name: mysql-secret  # Name of the Secret
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-root-password
+                key: MYSQL_ROOT_PASSWORD
