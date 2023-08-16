@@ -53,7 +53,7 @@ pipeline {
                      helm repo index charts/ --url gs://helm-files
                      gsutil cp charts/* gs://helm-files
                      cd ..
-                     helm-install.sh
+                     bash helm-install.sh
                  '''
                     try {
                         echo "Testing test environment..."
