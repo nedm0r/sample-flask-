@@ -48,9 +48,9 @@ pipeline {
                     sh '''
                       cd workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/
                       python3 version-control-helm.py
-                      rm -rf charts/*'
-                      helm package . --destination charts/'
-                      
+                      rm -rf charts/*
+                      helm package . --destination charts/
+                       '''
                             sh 'sudo helm repo index . --url gs://helm-files'
                             sh 'gsutil cp * gs://helm-files'
                         }
