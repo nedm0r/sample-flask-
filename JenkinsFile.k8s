@@ -45,7 +45,14 @@ pipeline {
                 script {
                     sh 'kubectl config use-context docker-desktop'
                     sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
-                    sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                    sh ''
+                       cd workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/
+                       python3 version-control-helm.py
+                       sudo rm -rf charts/*
+                       sudo helm package . --destination charts/
+                       cd charts/
+                       sudo helm repo index . --url gs://helm-files
+                       gsutil cp *  gs://helm_server
                     try {
                         echo "Testing test environment..."
                         retry(30) {
