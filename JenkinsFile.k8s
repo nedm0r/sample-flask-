@@ -45,7 +45,7 @@ pipeline {
                 script {
                     sh 'kubectl config use-context docker-desktop'
                     sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
-                    dir(path: 'workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/') {
+                    dir(path: '/workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/') {
                         sh 'python3 version-control-helm.py'
                         sh 'rm -rf charts/*'
                         sh 'helm package . --destination charts/'
