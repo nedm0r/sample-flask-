@@ -45,11 +45,12 @@ pipeline {
                 script {
                     sh 'kubectl config use-context docker-desktop'
                     sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
-                    dir(path: 'workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/') {
-                        sh 'python3 version-control-helm.py'
-                        sh 'sudo rm -rf charts/*'
-                        sh 'sudo helm package . --destination charts/'
-                        dir(path: 'charts/') {
+                    sh '''
+                      cd workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/
+                      python3 version-control-helm.py
+                      rm -rf charts/*'
+                      helm package . --destination charts/'
+                      
                             sh 'sudo helm repo index . --url gs://helm-files'
                             sh 'gsutil cp * gs://helm-files'
                         }
