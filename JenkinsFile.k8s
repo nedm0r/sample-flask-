@@ -50,9 +50,9 @@ pipeline {
                       python3 version-control-helm.py
                       rm -rf charts/*
                       helm package . --destination charts/
-                       '''
-                            sh 'sudo helm repo index . --url gs://helm-files'
-                            sh 'gsutil cp * gs://helm-files'
+                    '''
+                      sh 'sudo helm repo index . --url gs://helm-files'
+                      sh 'gsutil cp * gs://helm-files'
                         }
                             dir(path: 'workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/')
                             sh 'helm-install.sh'
