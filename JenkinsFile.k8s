@@ -52,7 +52,9 @@ pipeline {
                        sudo helm package . --destination charts/
                        cd charts/
                        sudo helm repo index . --url gs://helm-files
-                       gsutil cp *  gs://helm_server
+                       gsutil cp *  gs://helm-files
+                       cd .. 
+                       bash version-control-helm.py
                     try {
                         echo "Testing test environment..."
                         retry(30) {
