@@ -52,8 +52,6 @@ pipeline {
                      helm package . --destination charts/
                      helm repo index charts/ --url gs://helm-files
                      gsutil cp charts/* gs://helm-files
-                     cd ..
-                     pwd
                      bash helm-install.sh
                  '''
                     try {
