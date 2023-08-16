@@ -69,8 +69,48 @@ pipeline {
             }
         }
         
-        // Rest of your stages
+        stage('Confirm Deployment') {
+            steps {
+                input "Do you want to proceed with the deployment to production?"
+            }
+        }
         
+        stage('Terraform Deployment') {
+            steps {
+                script {
+                    sh 'echo "Deploying with Terraform..."'
+                    sh '''
+                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/
+                        ls
+                        chmod +r main.tf variables.auto.tfvars variables.tf
+                        export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
+                        terraform init
+                        terraform refresh 
+                        terraform apply -auto-approve 
+                    '''
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    echo "Deploying..."
+                    echo "Deploying to production..."
+                    
+                    sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
+                    sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
+                    sh 'kubectl delete replicaset.apps -l app=my-flask-app-deployment'
+                    sh 'kubectl delete replicaset.apps -l app=mysql-deployment'
+                    sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                    sh 'kubectl rollout restart deployment/my-flask-app-deployment'
+                    sh 'kubectl rollout restart deployment/mysql-deployment'
+                    
+                    def externalIP = getExternalIP()
+                    echo "External IP: ${externalIP}:5000"
+                }
+            }
+        }
     }
 }
 
