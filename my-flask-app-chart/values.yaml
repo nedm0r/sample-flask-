@@ -5,13 +5,13 @@ myFlaskApp:
     tag: latest
   envFrom:
     - secretRef:
-       name: mysql-secret  # Name of the Secret
+        name: mysql-secret  # Name of the Secret
 
 mysql:
   replicaCount: 1
   image:
     repository: nedm0r/flask-database
     tag: latest
-   envFrom:
+  envFrom:
     - secretRef:
         name: mysql-secret  # Name of the Secret
