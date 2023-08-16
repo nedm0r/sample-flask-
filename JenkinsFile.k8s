@@ -53,7 +53,8 @@ pipeline {
                             sh 'sudo helm repo index . --url gs://helm-files'
                             sh 'gsutil cp * gs://helm-files'
                         }
-                        sh 'bash version-control-helm.py'
+                            dir(path: 'workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/')
+                            sh 'helm-install.sh'
                     }
                     try {
                         echo "Testing test environment..."
