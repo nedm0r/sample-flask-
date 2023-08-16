@@ -45,16 +45,16 @@ pipeline {
                 script {
                     sh 'kubectl config use-context docker-desktop'
                     sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
-                    sh ''
-                       cd workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/
-                       python3 version-control-helm.py
-                       sudo rm -rf charts/*
-                       sudo helm package . --destination charts/
-                       cd charts/
-                       sudo helm repo index . --url gs://helm-files
-                       gsutil cp *  gs://helm-files
-                       cd .. 
-                       bash version-control-helm.py
+                    dir(path: 'workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/') {
+                        sh 'python3 version-control-helm.py'
+                        sh 'sudo rm -rf charts/*'
+                        sh 'sudo helm package . --destination charts/'
+                        dir(path: 'charts/') {
+                            sh 'sudo helm repo index . --url gs://helm-files'
+                            sh 'gsutil cp * gs://helm-files'
+                        }
+                        sh 'bash version-control-helm.py'
+                    }
                     try {
                         echo "Testing test environment..."
                         retry(30) {
@@ -64,9 +64,8 @@ pipeline {
                     } catch (Exception e) {
                         echo "Error: ${e.getMessage()}"
                         error "Failed To Curl Test"
-                    } 
+                    }
                     sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-                    
                 }
             }
         }
