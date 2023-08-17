@@ -18,4 +18,3 @@ INSERT INTO images(url, description) VALUES
 ('https://media.tenor.com/-o7IJJHaE5MAAAAM/kto-kounotoritoken.gif', 'a'),
 ('https://media.giphy.com/media/yr7n0u3qzO9nG/giphy.gif', 'a'),
 ('https://media.tenor.com/rMLswxLq2uEAAAAM/funny-as.gif', 'a'),
-('https://media.tenor.com/-o7IJJHaE5MAAAAM/kto-kounotoritoken.gif', 'a');
