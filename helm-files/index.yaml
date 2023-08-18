@@ -1,0 +1,12 @@
+apiVersion: v1
+entries:
+  my-flask-app-chart:
+  - apiVersion: v2
+    created: "2023-08-18T17:55:37.349668694+03:00"
+    description: Helm chart for Flask App and MySQL
+    digest: 2662f4309681688fb3605f5f2ecf63fa4049804e03c9540a9a182fa3bd3b7be9
+    name: my-flask-app-chart
+    urls:
+    - gs://helm-files/my-flask-app-chart-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-08-18T17:55:37.349297687+03:00"

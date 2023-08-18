@@ -1,0 +1,5 @@
+apiVersion: v2
+name: my-flask-app-chart
+description: Helm chart for Flask App and MySQL
+version: 0.1.0
+

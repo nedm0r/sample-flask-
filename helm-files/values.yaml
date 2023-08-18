@@ -1,0 +1,8 @@
+myFlaskApp:
+  image:
+    repository: nedm0r/docker-flask-project
+    tag: '4.8'
+mysql:
+  image:
+    repository: nedm0r/flask-database
+    tag: '2.0'
