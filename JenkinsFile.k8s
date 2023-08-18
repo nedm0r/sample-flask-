@@ -23,6 +23,8 @@ pipeline {
                     sh 'echo "Building..."'
                     sh 'git clone git@github.com:nedm0r/sample-flask-.git'
                     sh 'ls'
+                    sh 'export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" '
+
                 }
             }
         }
@@ -50,7 +52,6 @@ pipeline {
                      python3 version-control-helm.py
                      rm -rf charts/*
                      helm package . --destination charts/
-                     export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
                      helm repo index charts/ --url gs://helm-files
                      gsutil cp charts/* gs://helm-files
                      bash helm-install.sh
