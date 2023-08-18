@@ -45,15 +45,7 @@ pipeline {
                 script {
                     sh 'kubectl config use-context docker-desktop'
                     sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
-                    sh '''
-                     cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/my-flask-app-chart/
-                     python3 version-control-helm.py
-                     rm -rf charts/*
-                     helm package . --destination charts/
-                     helm repo index charts/ --url gs://helm-files
-                     gsutil cp charts/* gs://helm-files
-                     bash helm-install.sh
-                 '''
+                    sh 'kubectl apply -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                     try {
                         echo "Testing test environment..."
                         retry(30) {
@@ -63,8 +55,9 @@ pipeline {
                     } catch (Exception e) {
                         echo "Error: ${e.getMessage()}"
                         error "Failed To Curl Test"
-                    }
+                    } 
                     sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                    
                 }
             }
         }
