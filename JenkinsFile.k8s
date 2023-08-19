@@ -29,9 +29,9 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/flask
+                        cd workspace/Pipeline-K8S/sample-flask-/flask
                         python3 finddockerver.py
-                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Mysql
+                        cd workspace/Pipeline-K8S/sample-flask-/Mysql
                         python3 findsqlver.py
                     '''
                 }
@@ -42,10 +42,10 @@ pipeline {
             steps {
                 script {
                     sh 'kubectl config use-context docker-desktop'
-                    sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
+                    sh 'kubectl delete -f workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
                     sh '''
                      export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
-                     cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/helm-files/
+                     cd workspace/Pipeline-K8S/sample-flask-/helm-files/
                      python3 version-control-helm.py
                      rm -rf charts/*
                      helm package . --destination charts/
@@ -63,7 +63,7 @@ pipeline {
                         echo "Error: ${e.getMessage()}"
                         error "Failed To Curl Test"
                     }
-                    sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                    sh 'kubectl delete -f workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
                 }
             }
         }
@@ -72,7 +72,7 @@ pipeline {
             steps {
                 script {
                     def userInput = input message: 'Which stage next?', 
-                                  parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Выберите этап развертывания.')]
+                        parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Выберите этап развертывания.')]
 
                     if (userInput == 'Move to Deploy') {
                         env.DEPLOY_CHOICE = 'Deploy'
@@ -93,7 +93,7 @@ pipeline {
                 script {
                     sh 'echo "Deploying with Terraform..."'
                     sh '''
-                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/
+                        cd workspace/Pipeline-K8S/sample-flask-/terraform-files/
                         export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
                         terraform init
                         terraform refresh 
@@ -116,7 +116,7 @@ pipeline {
                     sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
                     sh '''
                       export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                      cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/helm-files/
+                      cd workspace/Pipeline-K8S/sample-flask-/helm-files/
                       bash helm-install.sh
                     ''' 
 
