@@ -46,14 +46,14 @@ pipeline {
                     sh 'kubectl config use-context docker-desktop'
                     sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
                     sh '''
-                     export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
-                     cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/helm-files/
-                     python3 version-control-helm.py
-                     rm -rf charts/*
-                     helm package . --destination charts/
-                     helm repo index charts/ --url gs://helm-files
-                     gsutil cp charts/* gs://helm-files
-                     bash helm-install.sh
+                        export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
+                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/helm-files/
+                        python3 version-control-helm.py
+                        rm -rf charts/*
+                        helm package . --destination charts/
+                        helm repo index charts/ --url gs://helm-files
+                        gsutil cp charts/* gs://helm-files
+                        bash helm-install.sh
                     '''
                     try {
                         echo "Testing test environment..."
@@ -73,13 +73,11 @@ pipeline {
         stage('Confirm Deployment') {
             steps {
                 script {
-                    def userInput = input message: 'Какой следующий шаг?', 
-                                parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy', 'Stop CI/CD'], description: 'Выберите этап развертывания.')]
+                    def userInput = input message: 'Which stage next?', 
+                        parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Выберите этап развертывания.')]
                     
-                    if (userInput == 'Stop CI/CD') {
-                        error("Остановка CI/CD по запросу пользователя.")
-                    } else if (userInput == 'Move to Deploy') {
-                        currentBuild.result = 'NOT_BUILT'
+                    if (userInput == 'Move to Deploy') {
+                        currentBuild.result = 'DEPLOY'
                         return
                     }
                 }
@@ -89,7 +87,7 @@ pipeline {
         stage('Terraform Deployment') {
             when {
                 expression {
-                    currentBuild.result != 'NOT_BUILT'
+                    currentBuild.result != 'DEPLOY'
                 }
             }
             steps {
