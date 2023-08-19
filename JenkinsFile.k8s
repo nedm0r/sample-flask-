@@ -29,9 +29,9 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        cd ${WORKSPACE}/Pipeline-K8S/sample-flask-/flask
+                        cd ${WORKSPACE}/sample-flask-/flask
                         python3 finddockerver.py
-                        cd ${WORKSPACE}/Pipeline-K8S/sample-flask-/Mysql
+                        cd ${WORKSPACE}/sample-flask-/Mysql
                         python3 findsqlver.py
                     '''
                 }
@@ -42,10 +42,10 @@ pipeline {
             steps {
                 script {
                     sh 'kubectl config use-context docker-desktop'
-                    sh 'kubectl delete -f ${WORKSPACE}/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
+                    sh 'kubectl delete -f ${WORKSPACE}/sample-flask-/Create-Cluster.yaml --ignore-not-found'
                     sh '''
                      export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
-                     cd ${WORKSPACE}/Pipeline-K8S/sample-flask-/helm-files/
+                     cd ${WORKSPACE}/sample-flask-/helm-files/
                      python3 version-control-helm.py
                      rm -rf charts/*
                      helm package . --destination charts/
@@ -63,7 +63,7 @@ pipeline {
                         echo "Error: ${e.getMessage()}"
                         error "Failed To Curl Test"
                     }
-                    sh 'kubectl delete -f ${WORKSPACE}/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
+                    sh 'kubectl delete -f ${WORKSPACE}/sample-flask-/Create-Cluster.yaml'
                 }
             }
         }
@@ -93,7 +93,7 @@ pipeline {
                 script {
                     sh 'echo "Deploying with Terraform..."'
                     sh '''
-                        cd ${WORKSPACE}/Pipeline-K8S/sample-flask-/terraform-files/
+                        cd ${WORKSPACE}/sample-flask-/terraform-files/
                         export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
                         terraform init
                         terraform refresh 
@@ -116,7 +116,7 @@ pipeline {
                     sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
                     sh '''
                       export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                      cd ${WORKSPACE}/Pipeline-K8S/sample-flask-/helm-files/
+                      cd ${WORKSPACE}/sample-flask-/helm-files/
                       bash helm-install.sh
                     ''' 
 
