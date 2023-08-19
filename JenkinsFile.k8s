@@ -2,7 +2,6 @@ pipeline {
     agent any
     environment {
         VM_IP = "192.168.59.1"
-        DEPLOY_CHOICE = '' 
     }
 
     stages {
@@ -107,8 +106,7 @@ pipeline {
         stage('Deploy') {
             when {
                 expression {
-                    env.DEPLOY_CHOICE == 'Deploy'
-                }
+                  env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == 'Terraform'                }
             }
             steps {
                 script {
