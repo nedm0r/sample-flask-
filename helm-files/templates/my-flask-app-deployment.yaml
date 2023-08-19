@@ -3,7 +3,12 @@ kind: Deployment
 metadata:
   name: my-flask-app-deployment
 spec:
-  replicas: 1
+  replicas: 3  
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: my-flask-app
