@@ -2,11 +2,48 @@ pipeline {
     agent any
     environment {
         VM_IP = "192.168.59.1"
-        DEPLOY_CHOICE = '' // Добавлено: переменная для выбора пользователя
     }
-
     stages {
-        //... другие этапы ...
+        stage('Cleanup') {
+            steps {
+                script {
+                    sh 'echo "Performing cleanup..."'
+                    sh 'pwd'
+                    sh 'rm -rf *'
+                }
+            }
+        }
+        
+        stage('Clone') {
+            steps {
+                script {
+                    sh 'echo "Building..."'
+                    sh 'git clone git@github.com:nedm0r/sample-flask-.git'
+                    sh 'ls'
+                }
+            }
+        }
+        
+        stage('Upload to Docker Hub') {
+            steps {
+                script {
+                    sh '''
+                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/flask
+                        python3 finddockerver.py
+                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Mysql
+                        python3 findsqlver.py
+                    '''
+                }
+            }
+        }
+
+        stage('Testing') {
+            steps {
+                script {
+                    //... код этапа Testing ...
+                }
+            }
+        }
 
         stage('Confirm Deployment') {
             steps {
