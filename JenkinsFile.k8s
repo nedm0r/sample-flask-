@@ -83,8 +83,7 @@ pipeline {
                     sh 'echo "Deploying with Terraform..."'
                     sh '''
                         cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/terraform-files/
-                        ls
-                        chmod +r main.tf variables.auto.tfvars variables.tf
+                        export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
                         terraform init
                         terraform refresh 
                         terraform apply -auto-approve 
