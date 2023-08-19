@@ -2,7 +2,6 @@ pipeline {
     agent any
     environment {
         VM_IP = "192.168.59.1"
-        DEPLOY_CHOICE = '' 
     }
 
     stages {
@@ -72,7 +71,7 @@ pipeline {
         stage('Confirm Deployment') {
             steps {
                 script {
-                    def userInput = input message: 'Какой следующий шаг?', 
+                    def userInput = input message: 'Which stage next?', 
                                   parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Выберите этап развертывания.')]
 
                     if (userInput == 'Move to Deploy') {
