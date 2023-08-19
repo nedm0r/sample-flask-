@@ -103,30 +103,27 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            when {
-                expression {
-                  env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == 'Terraform'                }
-            }
-            steps {
-                script {
-                    echo "Deploying..."
-                    sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
-                    sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
-                    sh '''
-                      export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                      cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/helm-files/
-                      bash helm-install.sh
-                    ''' 
+       stage('Deploy') {
+    when {
+        expression {
+            env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == 'Terraform'
+        }
+    }
+    steps {
+        script {
+            echo "Deploying..."
+            sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
+            sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
+            sh '''
+                export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
+                cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/helm-files/
+                bash helm-install.sh
+            '''
 
-                    def externalIP = getExternalIP()
-                    echo "External IP: ${externalIP}:5000"
-                }
-            }
+            // Get External IP using kubectl command
+            def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+            echo "External IP: ${externalIP}:5000"
         }
     }
 }
 
-def getExternalIP() {
-    return sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-}
