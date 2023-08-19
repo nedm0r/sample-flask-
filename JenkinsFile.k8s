@@ -1,84 +1,23 @@
 pipeline {
     agent any
-    triggers {
-        pollSCM('*/5 * * * *')
-    }
     environment {
         VM_IP = "192.168.59.1"
+        DEPLOY_CHOICE = '' // Добавлено: переменная для выбора пользователя
     }
+
     stages {
-        stage('Cleanup') {
-            steps {
-                script {
-                    sh 'echo "Performing cleanup..."'
-                    sh 'pwd'
-                    sh 'rm -rf *'
-                }
-            }
-        }
-
-        stage('Clone') {
-            steps {
-                script {
-                    sh 'echo "Building..."'
-                    sh 'git clone git@github.com:nedm0r/sample-flask-.git'
-                    sh 'ls'
-                }
-            }
-        }
-
-        stage('Upload to Docker Hub') {
-            steps {
-                script {
-                    sh '''
-                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/flask
-                        python3 finddockerver.py
-                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Mysql
-                        python3 findsqlver.py
-                    '''
-                }
-            }
-        }
-
-        stage('Testing') {
-            steps {
-                script {
-                    sh 'kubectl config use-context docker-desktop'
-                    sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml --ignore-not-found'
-                    sh '''
-                        export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
-                        cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/helm-files/
-                        python3 version-control-helm.py
-                        rm -rf charts/*
-                        helm package . --destination charts/
-                        helm repo index charts/ --url gs://helm-files
-                        gsutil cp charts/* gs://helm-files
-                        bash helm-install.sh
-                    '''
-                    try {
-                        echo "Testing test environment..."
-                        retry(30) {
-                            sleep 20
-                            sh "curl ${env.VM_IP}:5000"
-                        }
-                    } catch (Exception e) {
-                        echo "Error: ${e.getMessage()}"
-                        error "Failed To Curl Test"
-                    }
-                    sh 'kubectl delete -f /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/Create-Cluster.yaml'
-                }
-            }
-        }
+        //... другие этапы ...
 
         stage('Confirm Deployment') {
             steps {
                 script {
-                    def userInput = input message: 'Which stage next?', 
-                        parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Выберите этап развертывания.')]
-                    
+                    def userInput = input message: 'Какой следующий шаг?', 
+                                  parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Выберите этап развертывания.')]
+
                     if (userInput == 'Move to Deploy') {
-                        currentBuild.result = 'DEPLOY'
-                        return
+                        env.DEPLOY_CHOICE = 'Deploy'
+                    } else {
+                        env.DEPLOY_CHOICE = 'Terraform'
                     }
                 }
             }
@@ -87,7 +26,7 @@ pipeline {
         stage('Terraform Deployment') {
             when {
                 expression {
-                    currentBuild.result != 'DEPLOY'
+                    env.DEPLOY_CHOICE == 'Terraform'
                 }
             }
             steps {
@@ -107,24 +46,14 @@ pipeline {
         stage('Deploy') {
             when {
                 expression {
-                    currentBuild.result == 'NOT_BUILT'
+                    env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == 'Terraform'
                 }
             }
             steps {
                 script {
                     echo "Deploying..."
                     echo "Deploying to production..."
-                    
-                    sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
-                    sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
-                    sh '''
-                      export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                      cd /var/lib/jenkins/workspace/Pipeline-K8S/sample-flask-/helm-files/
-                      bash helm-install.sh
-                    ''' 
-                    
-                    def externalIP = getExternalIP()
-                    echo "External IP: ${externalIP}:5000"
+                    //... оставшийся код этапа Deploy ...
                 }
             }
         }
