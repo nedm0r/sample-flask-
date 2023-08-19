@@ -23,7 +23,6 @@ pipeline {
                     sh 'echo "Building..."'
                     sh 'git clone git@github.com:nedm0r/sample-flask-.git'
                     sh 'ls'
-
                 }
             }
         }
@@ -73,11 +72,32 @@ pipeline {
         
         stage('Confirm Deployment') {
             steps {
-                input "Do you want to proceed with the deployment to production?"
+                script {
+                    def userInput = input(
+                        id: 'deploymentChoice',
+                        message: 'Do you want to proceed with the deployment?',
+                        parameters: [
+                            choice(name: 'Move to Terraform Deploying', value: 'terraform'),
+                            choice(name: 'Move to Deploy', value: 'deploy'),
+                            choice(name: 'Stop CI/CD', value: 'stop')
+                        ]
+                    )
+
+                    if (userInput == 'terraform') {
+                        echo "Moving to Terraform Deployment stage..."
+                    } else if (userInput == 'deploy') {
+                        echo "Moving to Deploy stage..."
+                    } else if (userInput == 'stop') {
+                        error "CI/CD process has been stopped."
+                    }
+                }
             }
         }
         
         stage('Terraform Deployment') {
+            when {
+                expression { return userInput == 'terraform' }
+            }
             steps {
                 script {
                     sh 'echo "Deploying with Terraform..."'
@@ -93,6 +113,9 @@ pipeline {
         }
         
         stage('Deploy') {
+            when {
+                expression { return userInput == 'deploy' }
+            }
             steps {
                 script {
                     echo "Deploying..."
