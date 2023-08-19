@@ -15,44 +15,60 @@ pipeline {
             }
         }
 
-        stage('Clone') {
+        stage('Clone Repository') {
             steps {
                 script {
-                    sh 'echo "Building..."'
+                    sh 'echo "Cloning repository..."'
                     sh 'git clone git@github.com:nedm0r/sample-flask-.git'
-                    sh 'ls'
                 }
             }
         }
 
-        stage('Upload to Docker Hub') {
+        stage('Upload Flask Docker Image') {
+            steps {
+                script {
+                    sh "cd ${WORKSPACE}/sample-flask-/flask"
+                    sh 'python3 finddockerver.py'
+                }
+            }
+        }
+
+        stage('Upload MySQL Docker Image') {
+            steps {
+                script {
+                    sh "cd ${WORKSPACE}/sample-flask-/Mysql"
+                    sh 'python3 findsqlver.py'
+                }
+            }
+        }
+
+        stage('Prepare Testing Environment') {
+            steps {
+                sh 'kubectl config use-context docker-desktop'
+                sh 'kubectl delete -f ${WORKSPACE}/sample-flask-/Create-Cluster.yaml --ignore-not-found'
+            }
+        }
+
+        stage('Configure Helm Charts') {
             steps {
                 script {
                     sh '''
-                        cd ${WORKSPACE}/sample-flask-/flask
-                        python3 finddockerver.py
-                        cd ${WORKSPACE}/sample-flask-/Mysql
-                        python3 findsqlver.py
+                        export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
+                        cd ${WORKSPACE}/sample-flask-/helm-files/
+                        python3 version-control-helm.py
+                        rm -rf charts/*
+                        helm package . --destination charts/
+                        helm repo index charts/ --url gs://helm-files
+                        gsutil cp charts/* gs://helm-files
+                        bash helm-install.sh
                     '''
                 }
             }
         }
 
-        stage('Testing') {
+        stage('Test Application') {
             steps {
                 script {
-                    sh 'kubectl config use-context docker-desktop'
-                    sh 'kubectl delete -f ${WORKSPACE}/sample-flask-/Create-Cluster.yaml --ignore-not-found'
-                    sh '''
-                     export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
-                     cd ${WORKSPACE}/sample-flask-/helm-files/
-                     python3 version-control-helm.py
-                     rm -rf charts/*
-                     helm package . --destination charts/
-                     helm repo index charts/ --url gs://helm-files
-                     gsutil cp charts/* gs://helm-files
-                     bash helm-install.sh
-                 '''
                     try {
                         echo "Testing test environment..."
                         retry(30) {
@@ -63,8 +79,13 @@ pipeline {
                         echo "Error: ${e.getMessage()}"
                         error "Failed To Curl Test"
                     }
-                    sh 'kubectl delete -f ${WORKSPACE}/sample-flask-/Create-Cluster.yaml'
                 }
+            }
+        }
+
+        stage('Cleanup After Testing') {
+            steps {
+                sh 'kubectl delete -f ${WORKSPACE}/sample-flask-/Create-Cluster.yaml'
             }
         }
 
@@ -103,7 +124,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Application') {
             when {
                 expression {
                   env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == 'Terraform'
