@@ -6,15 +6,21 @@ import time
 
 app = Flask(__name__)
 
+# Retrieve MySQL configurations from environment variables
+host = os.environ.get("DB_HOST")
+user = os.environ.get("DB_USER")
+password = os.environ.get("DB_PASSWORD")
+database = os.environ.get("DB_NAME")
+
 # Configure MySQL connection
 db = None
 while db is None:
     try:
         db = mysql.connector.connect(
-            host="db",
-            user="root",
-            password="password",
-            database="flask_db"
+            host=host,
+            user=user,
+            password=password,
+            database=database
         )
     except mysql.connector.Error as err:
         print("Failed connecting to database. Retrying...")
