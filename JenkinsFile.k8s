@@ -153,3 +153,15 @@ pipeline {
         }
     }
 }
+
+post {
+        failure {
+            emailext (
+                subject: "Build Failed: ${currentBuild.fullDisplayName}",
+                body: "The build has failed. Check the console output for details.",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                to: "dionisromanovskyi78@gmail.com"
+            )
+        }
+    }
+}
