@@ -152,4 +152,20 @@ pipeline {
                 script {  
                     sleep 10 
                     def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-                    echo "External IP
+                    echo "External IP: ${externalIP}:5000"
+                }
+            }
+        }
+    }
+    
+    post {
+        failure {
+            emailext (
+                subject: "Build Failed: ${currentBuild.fullDisplayName}",
+                body: "The build has failed. Check the console output for details.",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                to: "dionisromanovskyi78@gmail.com"
+            )
+        }
+    }
+}
