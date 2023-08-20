@@ -28,7 +28,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Clone Repository') {
             steps {
                 sh 'echo "Cloning repository..."'
@@ -146,10 +146,12 @@ pipeline {
                     export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
                     cd ${WORKSPACE}/sample-flask-/helm-files/
                     bash helm-install.sh
-                ''' 
-
-                def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-                echo "External IP: ${externalIP}:5000"
+                '''
+                
+                script {  
+                    def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+                    echo "External IP: ${externalIP}:5000"
+                }
             }
         }
     }
