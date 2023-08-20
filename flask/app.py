@@ -17,12 +17,13 @@ db_database = os.environ.get("MYSQL_DATABASE", "flask_db")
 db = None
 while db is None:
     try:
-        db = mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database
-        )
+       db = mysql.connector.connect(
+       host=db_host,
+       user=db_user,
+       password=db_password,
+       database=db_database
+    )
+ 
     except mysql.connector.Error as err:
         print("Failed connecting to database. Retrying...")
         time.sleep(1)
