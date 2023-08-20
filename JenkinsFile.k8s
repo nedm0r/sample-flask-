@@ -102,16 +102,15 @@ pipeline {
         stage('Confirm Deployment') {
             steps {
                 script {
-                    env.DEPLOY_CHOICE = 'Deploy' // set default choice
                     try {
-                        timeout(time: 20, unit: 'SECONDS') {
+                        timeout(20) {
                             def userInput = input message: 'Which stage next?', 
                                 parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Select deployment stage.')]
                             env.DEPLOY_CHOICE = userInput
                         }
-                    } catch (Exception e) {
-                        // If timeout is reached, it will use the default 'Deploy' value
-                        echo "Timeout reached, moving to default Deploy stage."
+                    } catch (InterruptedException e) {
+                        echo "Timeout reached, defaulting to 'Deploy' stage."
+                        env.DEPLOY_CHOICE = 'Deploy'
                     }
                 }
             }
@@ -150,24 +149,7 @@ pipeline {
                     cd ${WORKSPACE}/sample-flask-/helm-files/
                     bash helm-install.sh
                 '''
-                
                 script {  
                     sleep 10 
                     def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-                    echo "External IP: ${externalIP}:5000"
-                }
-            }
-        }
-    }
-    
-    post {
-        failure {
-            emailext (
-                subject: "Build Failed: ${currentBuild.fullDisplayName}",
-                body: "The build has failed. Check the console output for details.",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']],
-                to: "dionisromanovskyi78@gmail.com"
-            )
-        }
-    }
-}
+                    echo "External IP
