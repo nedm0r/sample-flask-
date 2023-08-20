@@ -11,6 +11,7 @@
 </head>
 
 <body style="background-image: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnRjbXN0dTd1aDFwMzFlM2tzcmRxaXg3b3o3Y3poajh3NGFzcWIyYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/zQ3AodnNzEnNVEEb4R/giphy.gif'); background-repeat: no-repeat; background-size: cover;">
+
   <div class="container">
     <div class="content">
       <h1><span style="color:#99004C;">Ｓｅｌａ - ＤｅｖＯｐｓ １０９３</span></h1>
@@ -37,6 +38,11 @@
       </a>
     </div>
   </div>
+
+  <audio autoplay loop>
+    <source src="Rick Astley - Never Gonna Give You Up.mp3" type="audio/mpeg">
+    Your browser does not support the audio tag.
+  </audio>
 
   <style>
     * {
@@ -150,55 +156,38 @@
       right: -150px;
       width: 250px;
       height: 250px;
-      background: rgba(125, 236, 255, 0.6);
-      pointer-events: none;
-      transform: rotate(-25deg);
-      transition: 0.4s cubic-bezier(0.34, 0.31, 0, 1.81) transform;
+      background: rgba(125, 236, 230, 0.1);
+      border-radius: 50%;
+      transition: 0.6s ease all;
     }
 
     .links a:after {
-      top: 0;
-      bottom: 0;
-      display: flex;
-      align-items: center;
-      right: 30px;
-      transform: translateX(80px);
-      transition: 0.3s cubic-bezier(0.34, 0.31, 0, 1.81) transform;
+      bottom: -10px;
+      right: -20px;
+      opacity: 0.6;
+      transition: 0.3s ease all;
     }
 
     .links a:hover {
-      background: rgba(156, 56, 248, 0.9);
-      box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.5);
+      transform: translateY(-5px);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
     }
 
     .links a:hover:before {
-      transform: rotate(-25deg) translateX(60px);
+      right: -80%;
+      top: -30%;
     }
 
     .links a:hover:after {
-      transform: none;
-    }
-
-    .links a strong,
-    .links a span {
-      position: relative;
-      z-index: 1;
+      bottom: 20px;
     }
 
     .links a strong {
-      font-weight: bold;
       display: block;
+      font-size: 0.7rem;
+      opacity: 0.8;
       margin-bottom: 5px;
-    }
-
-    .links a span {
-      font-size: 0.9rem;
-    }
-    
-    audio {
-      display: none;
     }
   </style>
 </body>
-
 </html>
