@@ -39,10 +39,18 @@
     </div>
   </div>
 
-  <audio autoplay loop>
-  <source src="/static/Rick%20Astley%20-%20Never%20Gonna%20Give%20You%20Up.mp3" type="audio/mpeg">
+  <audio id="backgroundAudio">
+    <source src="/static/RickAstley-NeverGonnaGiveYouUp.mp3" type="audio/mpeg">
     Your browser does not support the audio tag.
   </audio>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var audio = document.getElementById("backgroundAudio");
+        audio.play();
+    });
+</script>
+
 
   <style>
     * {
@@ -190,8 +198,6 @@
     }
   </style>
 </body>
-<<<<<<< HEAD
 </html>
-=======
 </html>
->>>>>>> a405c61 (21)
+
