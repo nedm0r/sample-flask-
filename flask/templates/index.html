@@ -41,18 +41,22 @@
 
   <audio id="backgroundAudio">
     <source src="/static/RickAstley-NeverGonnaGiveYouUp.mp3" type="audio/mpeg">
+    Your browser does not support the audio tag.
   </audio>
 
-<button id="playButton">Play audio</button>
+ <div id="playButtonContainer">
+    <button id="playButton">Воспроизвести аудио</button>
+ </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var audio = document.getElementById("backgroundAudio");
         var playButton = document.getElementById("playButton");
+        var playButtonContainer = document.getElementById("playButtonContainer");
         
         playButton.addEventListener("click", function() {
             audio.play();
-            playButton.style.display = "none"; // Скроем кнопку после начала воспроизведения
+            playButtonContainer.style.display = "none"; // Hide the button container after clicking play
         });
     });
 </script>
