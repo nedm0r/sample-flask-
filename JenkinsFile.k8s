@@ -111,16 +111,12 @@ pipeline {
                                 description: 'Select deployment stage.'
                             )
                         ],
-                        timeout: 20, // Timeout in seconds
-                        submitterParameter: 'DEPLOY_CHOICE' // Set the variable when the timeout occurs
+                        timeout: 20,
+                        submitterParameter: 'DEPLOY_CHOICE',
+                        defaultValue: 'Move to Deploy'
                     )
 
-                    // If the user input is not received within the timeout, set default choice
-                    if (userInput == null) {
-                        env.DEPLOY_CHOICE = 'Deploy'
-                    } else {
-                        env.DEPLOY_CHOICE = userInput
-                    }
+                    env.DEPLOY_CHOICE = userInput
                 }
             }
         }
@@ -128,7 +124,7 @@ pipeline {
         stage('Terraform Deployment') {
             when {
                 expression {
-                    env.DEPLOY_CHOICE == 'Terraform'
+                    env.DEPLOY_CHOICE == 'Move to Terraform Deploying'
                 }
             }
             steps {
@@ -146,7 +142,7 @@ pipeline {
         stage('Deploy Application') {
             when {
                 expression {
-                    env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == 'Terraform'
+                    env.DEPLOY_CHOICE == 'Move to Deploy'
                 }
             }
             steps {
