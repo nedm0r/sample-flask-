@@ -28,7 +28,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                       cd ${WORKSPACE}/sample-flask-/flask
+                       cd ${WORKSPACE}/ample-flask-/flask
                        python3 finddockerver.py
                     '''
                 }
