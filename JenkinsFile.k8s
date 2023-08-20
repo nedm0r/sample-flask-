@@ -18,7 +18,7 @@ pipeline {
                 sh 'rm -rf *'
             }
         }
-        
+
         stage('Set Environment Variables') {
             steps {
                 script {
@@ -102,11 +102,15 @@ pipeline {
         stage('Confirm Deployment') {
             steps {
                 script {
+                    env.DEPLOY_CHOICE = 'Deploy'
+                    
                     timeout(time: 20, unit: 'SECONDS') {
                         try {
                             def userInput = input message: 'Which stage next?', 
                                 parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Terraform', 'Deploy'], description: 'Select deployment stage.')]
-                            env.DEPLOY_CHOICE = userInput
+                            if (userInput == 'Terraform') {
+                                env.DEPLOY_CHOICE = userInput
+                            }
                         } catch (Exception e) {
                             echo "Timeout or another error occurred, defaulting to 'Deploy' stage."
                             env.DEPLOY_CHOICE = 'Deploy'
@@ -135,11 +139,6 @@ pipeline {
         }
 
         stage('Deploy Application') {
-            when {
-                expression {
-                    env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == null
-                }
-            }
             steps {
                 sh 'echo "Deploying..."'
                 sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
