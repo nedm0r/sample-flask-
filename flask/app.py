@@ -6,11 +6,12 @@ import time
 
 app = Flask(__name__)
 
+
 # Retrieve MySQL configurations from environment variables
-host = os.environ.get("DB_HOST")
-user = os.environ.get("DB_USER")
-password = os.environ.get("DB_PASSWORD")
-database = os.environ.get("DB_NAME")
+db_host = os.environ.get("MYSQL_HOST", "db")
+db_user = os.environ.get("MYSQL_USER", "root")
+db_password = os.environ.get("MYSQL_PASSWORD")
+db_database = os.environ.get("MYSQL_DATABASE", "flask_db")
 
 # Configure MySQL connection
 db = None
