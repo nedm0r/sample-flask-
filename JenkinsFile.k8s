@@ -102,13 +102,24 @@ pipeline {
         stage('Confirm Deployment') {
             steps {
                 script {
-                    def userInput = input message: 'Which stage next?', 
-                        parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Select deployment stage.')]
+                    def userInput = input(
+                        message: 'Which stage next?',
+                        parameters: [
+                            choice(
+                                name: 'DEPLOY_CHOICE',
+                                choices: ['Move to Terraform Deploying', 'Move to Deploy'],
+                                description: 'Select deployment stage.'
+                            )
+                        ],
+                        timeout: 20, // Timeout in seconds
+                        submitterParameter: 'DEPLOY_CHOICE' // Set the variable when the timeout occurs
+                    )
 
-                    if (userInput == 'Move to Deploy') {
+                    // If the user input is not received within the timeout, set default choice
+                    if (userInput == null) {
                         env.DEPLOY_CHOICE = 'Deploy'
                     } else {
-                        env.DEPLOY_CHOICE = 'Terraform'
+                        env.DEPLOY_CHOICE = userInput
                     }
                 }
             }
