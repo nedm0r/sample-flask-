@@ -58,7 +58,7 @@ pipeline {
                 script {
                     sh '''
                         export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                        cd ${WORKSPACE}/sample-flask-/elm-files/
+                        cd ${WORKSPACE}/sample-flask-/helm-files/
                         python3 version-control-helm.py
                         rm -rf charts/*
                         helm package . --destination charts/
