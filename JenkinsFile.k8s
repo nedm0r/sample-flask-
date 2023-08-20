@@ -152,8 +152,8 @@ pipeline {
                 script {  
                     sleep 10 
                     def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-                    <a href="http://${externalIP}:5000"></a>
-               }
+                    echo "External IP: ${externalIP}:5000"               
+                }
             }
         }
     }
