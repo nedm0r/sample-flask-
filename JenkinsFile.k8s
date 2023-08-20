@@ -3,46 +3,54 @@ pipeline {
     parameters {
         string(name: 'VM_IP', defaultValue: '192.168.59.1', description: 'IP address of the windows machine')
     }
+    
+    environment {
+        MYSQL_HOST = 'db'
+        MYSQL_USER = 'root'
+        MYSQL_DATABASE = 'flask_db'
+    }
 
     stages {
         stage('Cleanup') {
             steps {
-                script {
-                    sh 'echo "Performing cleanup..."'
-                    sh 'pwd'
-                    sh 'rm -rf *'
-                }
+                sh 'echo "Performing cleanup..."'
+                sh 'pwd'
+                sh 'rm -rf *'
             }
         }
 
-        stage('Clone Repository') {
+        stage('Set Environment Variables') {
             steps {
                 script {
-                    sh 'echo "Cloning repository..."'
-                    sh 'git clone git@github.com:nedm0r/sample-flask-.git'
+                    withCredentials([string(credentialsId: 'MYSQL_PASSWORD', variable: 'mysql-password')]) {
+                        echo "Environment variables set"
+                    }
                 }
+            }
+        }
+        
+        stage('Clone Repository') {
+            steps {
+                sh 'echo "Cloning repository..."'
+                sh 'git clone git@github.com:nedm0r/sample-flask-.git'
             }
         }
 
         stage('Upload Flask Docker Image') {
             steps {
-                script {
-                    sh '''
-                       cd ${WORKSPACE}/sample-flask-/flask
-                       python3 finddockerver.py
-                    '''
-                }
+                sh '''
+                    cd ${WORKSPACE}/sample-flask-/flask
+                    python3 finddockerver.py
+                '''
             }
         }
 
         stage('Upload MySQL Docker Image') {
             steps {
-                script {
-                    sh '''
-                       cd ${WORKSPACE}/sample-flask-/Mysql
-                       python3 findsqlver.py
-                    '''
-                }
+                sh '''
+                    cd ${WORKSPACE}/sample-flask-/Mysql
+                    python3 findsqlver.py
+                '''
             }
         }
 
@@ -55,18 +63,16 @@ pipeline {
 
         stage('Configure Helm Charts') {
             steps {
-                script {
-                    sh '''
-                        export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                        cd ${WORKSPACE}/sample-flask-/helm-files/
-                        python3 version-control-helm.py
-                        rm -rf charts/*
-                        helm package . --destination charts/
-                        helm repo index charts/ --url gs://helm-files
-                        gsutil cp charts/* gs://helm-files
-                        bash helm-install.sh
-                    '''
-                }
+                sh '''
+                    export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
+                    cd ${WORKSPACE}/sample-flask-/helm-files/
+                    python3 version-control-helm.py
+                    rm -rf charts/*
+                    helm package . --destination charts/
+                    helm repo index charts/ --url gs://helm-files
+                    gsutil cp charts/* gs://helm-files
+                    bash helm-install.sh
+                '''
             }
         }
 
@@ -115,44 +121,39 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    sh 'echo "Deploying with Terraform..."'
-                    sh '''
-                        cd ${WORKSPACE}/sample-flask-/terraform-files/
-                        export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
-                        terraform init
-                        terraform refresh 
-                        terraform apply -auto-approve 
-                    '''
-                }
+                sh 'echo "Deploying with Terraform..."'
+                sh '''
+                    cd ${WORKSPACE}/sample-flask-/terraform-files/
+                    export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json" 
+                    terraform init
+                    terraform refresh 
+                    terraform apply -auto-approve 
+                '''
             }
         }
 
         stage('Deploy Application') {
             when {
                 expression {
-                  env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == 'Terraform'
+                    env.DEPLOY_CHOICE == 'Deploy' || env.DEPLOY_CHOICE == 'Terraform'
                 }
             }
             steps {
-                script {
-                    echo "Deploying..."
-                    sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
-                    sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
-                    sh '''
-                      export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                      cd ${WORKSPACE}/sample-flask-/helm-files/
-                      bash helm-install.sh
-                    ''' 
+                sh 'echo "Deploying..."'
+                sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
+                sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
+                sh '''
+                    export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
+                    cd ${WORKSPACE}/sample-flask-/helm-files/
+                    bash helm-install.sh
+                ''' 
 
-                    // Get External IP using kubectl command
-                    def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
-                    echo "External IP: ${externalIP}:5000"
-                }
+                def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
+                echo "External IP: ${externalIP}:5000"
             }
         }
     }
-
+    
     post {
         failure {
             emailext (
