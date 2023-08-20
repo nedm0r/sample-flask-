@@ -102,20 +102,16 @@ pipeline {
         stage('Confirm Deployment') {
             steps {
                 script {
+                    env.DEPLOY_CHOICE = 'Deploy' // set default choice
                     try {
                         timeout(time: 20, unit: 'SECONDS') {
                             def userInput = input message: 'Which stage next?', 
                                 parameters: [choice(name: 'DEPLOY_CHOICE', choices: ['Move to Terraform Deploying', 'Move to Deploy'], description: 'Select deployment stage.')]
-
-                            if (userInput == 'Move to Deploy') {
-                                env.DEPLOY_CHOICE = 'Deploy'
-                            } else {
-                                env.DEPLOY_CHOICE = 'Terraform'
-                            }
+                            env.DEPLOY_CHOICE = userInput
                         }
                     } catch (Exception e) {
-                        // If timeout is reached, it will automatically set to 'Deploy'
-                        env.DEPLOY_CHOICE = 'Deploy'
+                        // If timeout is reached, it will use the default 'Deploy' value
+                        echo "Timeout reached, moving to default Deploy stage."
                     }
                 }
             }
