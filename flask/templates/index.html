@@ -38,34 +38,7 @@
       </a>
     </div>
   </div>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const audioPermission = document.getElementById("audioPermission");
-      const allowAudioButton = document.getElementById("allowAudio");
-      const denyAudioButton = document.getElementById("denyAudio");
-      const audio = document.getElementById("audio");
 
-      allowAudioButton.addEventListener("click", function () {
-        audioPermission.style.display = "none";
-        audio.play();
-      });
-
-      denyAudioButton.addEventListener("click", function () {
-        audioPermission.style.display = "none";
-      });
-
-      audio.addEventListener("play", function () {
-        if (!localStorage.getItem("audioAllowed")) {
-          audio.pause();
-          audioPermission.style.display = "block";
-        }
-      });
-
-      audio.addEventListener("ended", function () {
-        localStorage.setItem("audioAllowed", true);
-      });
-    });
-  </script>
 
   <style>
     * {
