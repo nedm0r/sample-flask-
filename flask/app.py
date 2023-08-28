@@ -41,9 +41,9 @@ def data():
     cursor = db.cursor()
     cursor.execute("SELECT url FROM images;")
     images = [row[0] for row in cursor.fetchall()]
-    return render_template("data.html", images=images)
-
-
+    # Select a random GIF URL from the list
+    random_gif = random.choice(images)
+    return render_template("data.html", random_gif=random_gif)
 
 
 if __name__ == "__main__":
