@@ -15,7 +15,7 @@ terraform {
 resource "google_container_cluster" "gke_cluster" {
   name               = var.gke_cluster_name
   location           = var.gke_zones[0]
-  initial_node_count = 1
+  initial_node_count = 4
 
   node_config {
     machine_type = var.gke_machine_type
@@ -40,7 +40,7 @@ resource "google_compute_firewall" "allow_inbound" {
   # Inbound traffic rules
   allow {
     protocol = "tcp"
-    ports    = ["22", "5000", "80", "443"]
+    ports    = ["22", "5000", "80", "443", "81"]
   }
 
   source_ranges = ["0.0.0.0/0"]
