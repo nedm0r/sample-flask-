@@ -23,9 +23,14 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
-          Environment:
-              MYSQL_ROOT_PASSWORD:  password  # Use this for root user's password
-              MYSQL_USER:           another_user  # Optionally, if you need another user
-              MYSQL_PASSWORD:       another_password  # Password for the other user
-              MYSQL_HOST:           db
-              MYSQL_DATABASE:       flask_db
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+            - name: MYSQL_USER
+              value: another_user
+            - name: MYSQL_PASSWORD
+              value: another_password
+            - name: MYSQL_HOST
+              value: db
+            - name: MYSQL_DATABASE
+              value: flask_db
