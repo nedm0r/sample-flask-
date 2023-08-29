@@ -23,6 +23,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3306
-         envFrom:
+          envFrom:
             - secretRef:
                 name: mysql-credential
