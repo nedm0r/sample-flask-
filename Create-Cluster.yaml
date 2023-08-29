@@ -19,9 +19,17 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
-          envFrom:
-            - secretRef:
-                name: mysql-secrets
+          env:
+            - name: MYSQL_PASSWORD
+              value: password
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_HOST
+              value: db
+            - name: MYSQL_DATABASE
+              value: flask_db  
+            - name: MYSQL_ROOT_PASSWORD
+              value: password 
 ---
 # mysql-deployment.yaml
 apiVersion: apps/v1
@@ -44,9 +52,17 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3306
-          envFrom:
-            - secretRef:
-                name: mysql-secrets
+          env:
+            - name: MYSQL_PASSWORD
+              value: password
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_HOST
+              value: db
+            - name: MYSQL_DATABASE
+              value: flask_db  
+            - name: MYSQL_ROOT_PASSWORD
+              value: password 
 ---
 # my-flask-app-service.yaml
 apiVersion: v1
