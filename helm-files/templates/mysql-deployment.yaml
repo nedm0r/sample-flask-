@@ -32,3 +32,5 @@ spec:
               value: db
             - name: MYSQL_DATABASE
               value: flask_db  
+            - name: MYSQL_ROOT_PASSWORD
+              value: password  
