@@ -23,14 +23,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              value: password
-            - name: MYSQL_USER
-              value: another_user
-            - name: MYSQL_PASSWORD
-              value: another_password
-            - name: MYSQL_HOST
-              value: db
-            - name: MYSQL_DATABASE
-              value: flask_db
+          envFrom:
+            - secretRef:
+                name: mysql-credential
