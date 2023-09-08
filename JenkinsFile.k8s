@@ -138,6 +138,16 @@ pipeline {
             }
         }
 
+        stage('Set Environment Variables for Deployment') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'token-cd', variable: 'token-cd')]) {
+                        echo "Environment variables set"
+                    }
+                }
+            }
+        }
+
         stage('Deploy Application') {
             steps {
                 sh 'echo "Deploying..."'
