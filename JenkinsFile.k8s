@@ -162,7 +162,7 @@ pipeline {
                             python3 version-control-helm.py
                             git add . 
                             git commit -m 'values.yaml update' --allow-empty
-                            git push https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git
+                            git push https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git/helm-files/
                             echo "Deployment successful."
                         '''
                     }
