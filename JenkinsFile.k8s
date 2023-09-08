@@ -154,30 +154,27 @@ pipeline {
                 sh 'gcloud container clusters get-credentials devops-1093-cluster-tf --project=astute-impulse-393207 --zone=us-east1-b'
                 sh 'kubectl config use-context gke_astute-impulse-393207_us-east1-b_devops-1093-cluster-tf'
                 script {
-            withCredentials([string(credentialsId: 'token-cd', variable: 'TOKEN_CD')]) {
-                sh '''
-                    export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
-                    git clone https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git
-                    cd sample-flask-CD/
-                    python3 version-control-helm.py
-                    git add . 
-                    git commit -m 'values.yaml update' --allow-empty
-                    git push https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git
-                    echo "Deployment successful."
-                '''
-            }
-        }   
-    }
-                
- script {  
+                    withCredentials([string(credentialsId: 'token-cd', variable: 'TOKEN_CD')]) {
+                        sh '''
+                            export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
+                            git clone https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git
+                            cd sample-flask-CD/
+                            python3 version-control-helm.py
+                            git add . 
+                            git commit -m 'values.yaml update' --allow-empty
+                            git push https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git
+                            echo "Deployment successful."
+                        '''
+                    }
+                }
+                script {  
                     sleep 10 
                     def externalIP = sh(returnStdout: true, script: 'kubectl get service my-flask-app -o jsonpath="{.status.loadBalancer.ingress[0].ip}"').trim()
                     echo "External IP: ${externalIP}:5000"               
                 }
-            }
-        }
-    }
-    
+            } // Closing for steps block in 'Deploy Application' stage
+        } // Closing for 'Deploy Application' stage
+    } // Closing for stages block
     post {
         failure {
             emailext (
@@ -187,10 +184,7 @@ pipeline {
                 to: "dionisromanovskyi78@gmail.com"
             )
         }
-    }
-}
-
-
-
+    } // Closing for post block
+} // Closing for pipeline block
 
 
