@@ -158,11 +158,11 @@ pipeline {
                         sh '''
                             export GOOGLE_APPLICATION_CREDENTIALS="/var/lib/jenkins/.ssh/astute-impulse-393207-a213fc4eab2e.json"
                             git clone https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git
-                            cd sample-flask-CD/
+                            cd sample-flask-CD/helm-files/
                             python3 version-control-helm.py
                             git add . 
                             git commit -m 'values.yaml update' --allow-empty
-                            git push https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git/helm-files/
+                            git push https://${TOKEN_CD}@github.com/nedm0r/sample-flask-CD.git
                             echo "Deployment successful."
                         '''
                     }
